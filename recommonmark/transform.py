@@ -134,6 +134,34 @@ class AutoStructify(transforms.Transform):
             options={'maxdepth': 1, 'numbered': numbered},
             content=['%s <%s>' % (k, v) for k, v in refs])
 
+    def auto_doc_ref(self, node):
+        """Try to convert a reference to docref in rst.
+
+        Parameters
+        ----------
+        node : nodes.reference
+           A reference node in doctree.
+
+        Returns
+        -------
+        tocnode: docutils node
+            The converted toc tree node, None if conversion is not possible.
+        """
+        assert isinstance(node, nodes.reference)
+        title, uri, docpath = self.parse_ref(node)
+        if title is None:
+            return None
+        if docpath:
+            content = u'%s <%s>' % (title, docpath)
+            self.state_machine.reset(self.document,
+                                     node.parent,
+                                     self.current_level)
+            return self.state_machine.run_role('doc', content=content)
+        else:
+            # inplace modify uri
+            node['refuri'] = uri
+            return None
+
     def traverse(self, node):
         """Traverse the document tree rooted at node.
 
@@ -147,6 +175,8 @@ class AutoStructify(transforms.Transform):
                 self.current_level = node['level']
         elif isinstance(node, nodes.Sequential):
             newnode = self.auto_toc_tree(node)
+        elif isinstance(node, nodes.reference):
+            newnode = self.auto_doc_ref(node)
 
         if newnode:
             node.replace_self(newnode)
