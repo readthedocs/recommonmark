@@ -3,7 +3,7 @@ import itertools
 
 from docutils import parsers, nodes
 
-from CommonMark import DocParser, HTMLRenderer
+from CommonMark import Parser, HtmlRenderer
 from warnings import warn
 
 __all__ = ['CommonMarkParser']
@@ -40,26 +40,36 @@ class CommonMarkParser(parsers.Parser):
     """Parser of recommonmark."""
     supported = ('md', 'markdown')
 
-    def convert_blocks(self, blocks):
-        for block in blocks:
-            self.convert_block(block)
+    def __init__(self):
+        parsers.Parser.__init__(self)
+        # Save a set of seen node to avoid infinte recursion.
+        self._seen = set()
+
+    def convert_blocks(self, elements):
+        for element in elements:
+            block, container = element
+            if not container and block not in self._seen:
+                self.convert_block(block)
 
     def convert_block(self, block):
-        if (block.t == "Document"):
-            self.convert_blocks(block.children)
-        elif (block.t == "ATXHeader") or (block.t == "SetextHeader"):
+        self._seen.add(block)
+        if (block.t == "document"):
+            self.convert_blocks(block.walker())
+        elif (block.t == "atx_heading") or \
+                (block.t == "setext_heading") or \
+                (block.t == 'heading'):
             self.section(block)
-        elif (block.t == "Paragraph"):
+        elif (block.t == "paragraph"):
             self.paragraph(block)
-        elif (block.t == "BlockQuote"):
+        elif (block.t == "block_quote"):
             self.blockquote(block)
-        elif (block.t == "ListItem"):
+        elif (block.t == "list_item"):
             self.list_item(block)
-        elif (block.t == "List"):
+        elif (block.t == "list"):
             self.list_block(block)
-        elif (block.t == "IndentedCode"):
+        elif (block.t == "indented_code_block"):
             self.verbatim(block.string_content)
-        elif (block.t == "FencedCode"):
+        elif (block.t == "fenced_code_block"):
             if len(block.strings) and len(block.strings[0]):
                 lexer = block.strings[0].strip()
             else:
@@ -69,7 +79,7 @@ class CommonMarkParser(parsers.Parser):
             self.reference(block)
         elif (block.t == "HorizontalRule"):
             self.horizontal_rule()
-        elif (block.t == "HtmlBlock"):
+        elif (block.t == "html_block"):
             self.html_block(block)
         else:
             warn("Unsupported block type: " + block.t)
@@ -81,7 +91,7 @@ class CommonMarkParser(parsers.Parser):
         self.current_node = document
         self.section_handler = _SectionHandler(document)
 
-        parser = DocParser()
+        parser = Parser()
 
         ast = parser.parse(inputstring + '\n')
 
@@ -98,13 +108,14 @@ class CommonMarkParser(parsers.Parser):
 
     # Blocks
     def section(self, block):
-        new_section = nodes.section(' '.join(block.strings))
-        new_section.line = block.start_line
+        new_section = nodes.section(block.literal)
         new_section['level'] = block.level
 
-        title_node = nodes.title(' '.join(block.strings))
-        title_node.line = block.start_line
-        append_inlines(title_node, block.inline_content)
+        title_node = nodes.title(block.literal)
+        if block.string_content is not None:
+            append_inlines(title_node, block.string_content)
+        if block.first_child:
+            title_node.append(nodes.Text(block.first_child.literal))
         new_section.append(title_node)
         name = nodes.fully_normalize_name(title_node.astext())
         new_section['names'].append(name)
@@ -222,7 +233,7 @@ def inline_html(inline):
 
 
 def inline_entity(inline):
-    val = HTMLRenderer().renderInline(inline)
+    val = HtmlRenderer().renderInline(inline)
     entity_node = nodes.paragraph('', val, format='html')
     return entity_node
 
