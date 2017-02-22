@@ -47,8 +47,8 @@ class CommonMarkParser(parsers.Parser):
 
     def convert_blocks(self, elements):
         for element in elements:
-            block, container = element
-            if not container and block not in self._seen:
+            block, _ = element
+            if block not in self._seen:
                 self.convert_block(block)
 
     def convert_block(self, block):
@@ -59,7 +59,7 @@ class CommonMarkParser(parsers.Parser):
                 (block.t == "setext_heading") or \
                 (block.t == 'heading'):
             self.section(block)
-        elif (block.t == "paragraph"):
+        elif (block.t == "paragraph" or block.t == "text"):
             self.paragraph(block)
         elif (block.t == "block_quote"):
             self.blockquote(block)
@@ -67,8 +67,8 @@ class CommonMarkParser(parsers.Parser):
             self.list_item(block)
         elif (block.t == "list"):
             self.list_block(block)
-        elif (block.t == "indented_code_block"):
-            self.verbatim(block.string_content)
+        elif (block.t == "code_block"):
+            self.verbatim(block)
         elif (block.t == "fenced_code_block"):
             if len(block.strings) and len(block.strings[0]):
                 lexer = block.strings[0].strip()
@@ -124,9 +124,9 @@ class CommonMarkParser(parsers.Parser):
         self.section_handler.add_new_section(new_section, block.level)
         self.current_node = new_section
 
-    def verbatim(self, text):
+    def verbatim(self, block):
         verbatim_node = nodes.literal_block()
-        text = ''.join(flatten(text))
+        text = block.literal
         if text.endswith('\n'):
             text = text[:-1]
         verbatim_node.append(nodes.Text(text, text))
@@ -137,10 +137,10 @@ class CommonMarkParser(parsers.Parser):
         self.current_node.append(node)
 
     def paragraph(self, block):
-        p = nodes.paragraph(' '.join(block.strings))
-        p.line = block.start_line
-        append_inlines(p, block.inline_content)
-        self.current_node.append(p)
+        if block.first_child:
+            p = nodes.paragraph()
+            p.append(nodes.Text(block.first_child.literal))
+            self.current_node.append(p)
 
     def blockquote(self, block):
         q = nodes.block_quote(' '.join(block.strings))
