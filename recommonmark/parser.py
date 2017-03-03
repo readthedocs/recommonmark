@@ -4,7 +4,7 @@ import sphinx
 
 from docutils import parsers, nodes
 
-from CommonMark import DocParser, HTMLRenderer
+from CommonMark import Parser, HtmlRenderer
 from warnings import warn
 
 __all__ = ['CommonMarkParser']
@@ -223,7 +223,7 @@ def inline_html(inline):
 
 
 def inline_entity(inline):
-    val = HTMLRenderer().renderInline(inline)
+    val = HtmlRenderer().renderInline(inline)
     entity_node = nodes.paragraph('', val, format='html')
     return entity_node
 
