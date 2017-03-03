@@ -9,7 +9,6 @@ class TestStringMethods(unittest.TestCase):
 
     def test_basic_parser(self):
         source = '# Header'
-
         ret = publish_parts(
             source=source,
             writer_name='html',
