@@ -74,3 +74,13 @@ class XrefTests(SphinxIntegrationTests):
             '_build/text/index.html',
             ['href="link.html"', 'href="http://www.google.com"']
         )
+
+class TableExtensionTests(SphinxIntegrationTests):
+
+    def test_integration(self):
+        self._run_test(
+            'sphinx_table_extension',
+            '_build/text/index.html',
+            ['</table>', 'href="https://www.wikipedia.org/"', 'href="https://www.python.org/"',
+             'href="https://twitter.com/"', 'href="https://www.facebook.com/"']
+        )

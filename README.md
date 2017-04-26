@@ -66,6 +66,7 @@ AutoStructify comes with the following options. See http://recommonmark.readthed
 * __enable_math__: enable the Math Formula feature.
 * __enable_inline_math__: enable the Inline Math feature.
 * __enable_eval_rst__: enable the evaluate embedded reStructuredText feature.
+* __enable_table_extension__: enable basic markdown table support.
 * __url_resolver__: a function that maps a existing relative position in the document to a http link
 
 ## Development

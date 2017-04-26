@@ -2,6 +2,7 @@
 import os
 import sys
 import re
+import sphinx
 from .states import DummyStateMachine
 from docutils import nodes, transforms
 from docutils.statemachine import StringList
@@ -26,6 +27,7 @@ class AutoStructify(transforms.Transform):
         'enable_eval_rst': True,
         'enable_math': True,
         'enable_inline_math': True,
+        'enable_table_extension': False,
         'commonmark_suffixes': ['.md'],
         'url_resolver': lambda x: x,
     }
@@ -262,6 +264,126 @@ class AutoStructify(transforms.Transform):
                     content=content)
         return None
 
+    def table_extension(self, node):
+        """Convert markdown table to reStructuredText on the fly and create a docnode containing this table
+
+        Parameters
+        ----------
+        node : nodes.paragraph
+            A paragraph containing a Markdown table (begins and ends with |)
+        Returns
+        -------
+        tocnode: docutils node
+            The converted toc tree node, None if conversion is not possible.
+        """
+        if not self.config['enable_table_extension']:
+            return None
+
+        # Python 2&3 compatibility
+        if sys.version_info[0] == 3:
+            string_type = str
+        else:
+            string_type = basestring
+
+        original_node = node
+
+        rows = []
+        max_width = 0
+        max_cells = 0
+
+        current_row = []
+        current_cell = ''
+        for child in node.children:
+            if child == '\n':
+                # determine number of cells
+                if len(current_row) > max_cells:
+                    max_cells = len(current_row)
+                # update max_width
+                for cell in current_row:
+                    if len(cell) > max_width:
+                        max_width = len(cell)
+                # Finally append line and reset it
+                rows.append(current_row)
+                current_row = []
+
+            elif isinstance(child, string_type):
+                stripped_child = child.strip()
+                if stripped_child.startswith('|') and current_cell:
+                    # If the line starts with | it means the previous cell is finished -> Append it to current row
+                    current_row.append(current_cell)
+                    current_cell = ''
+
+                elements = stripped_child.split('|')
+                if len(elements) > 1:
+                    for i in range(len(elements)):
+                        e = elements[i]
+                        if e:
+                            if 0 < i < (len(elements) - 1):
+                                # If text is between two | add it as complete text
+                                current_row.append(e)
+                            else:
+                                # Otherwise, append text to current_cell
+                                current_cell += e
+                elif len(elements) == 1:
+                    current_cell += elements[0]
+
+                if stripped_child.endswith('|') and not stripped_child.startswith('|') and current_cell:
+                    # If the line ends with | it means the previous cell is finished -> Append it to current row
+                    current_row.append(current_cell)
+                    current_cell = ''
+
+            elif isinstance(child, nodes.reference):
+                # Convert reference to rst reference
+                current_cell += ' `' + child.attributes['name'] + ' <' + child.attributes['refuri'] + '>`_ '
+            elif isinstance(child, sphinx.addnodes.pending_xref):
+                current_cell += ' `' + child.children[0] + ' <' + child.attributes['reftarget'] + '>`_ '
+            else:
+                # Invalid child within table -> Abort
+                return None
+
+        # Finish last row
+        # determine number of cells
+        if len(current_row) > max_cells:
+            max_cells = len(current_row)
+        # update max_width
+        for cell in current_row:
+            if len(cell) > max_width:
+                max_width = len(cell)
+        # Finally append line
+        rows.append(current_row)
+
+        # Convert to rst
+        max_width += 2  # Because a space will be added on both sides of the cell
+        rst_lines = []
+        no_border = False
+        heading_pattern = re.compile('^[- ]+$', re.MULTILINE)
+        for line in rows:
+            if heading_pattern.search(''.join(line)):
+                rst_lines.append(('+' + ('=' * max_width)) * max_cells + '+')
+                no_border = True
+            else:
+                if not no_border:
+                    rst_lines.append(('+' + ('-' * max_width)) * max_cells + '+')
+                line_str = '|'
+                for cell in line:
+                    line_str += ' ' + cell + (' ' * (max_width - len(cell) - 2)) + ' |'
+                rst_lines.append(line_str)
+                no_border = False
+        rst_lines.append(('+' + ('-' * max_width)) * max_cells + '+')
+        rst_lines.append('')
+
+        # Create new node
+        self.state_machine.reset(self.document,
+                                 node.parent,
+                                 self.current_level)
+
+        node = nodes.section()
+        self.state_machine.state.nested_parse(
+            StringList(rst_lines, source=original_node.source),
+            0, node=node, match_titles=False)
+
+        return node.children[:]
+
     def find_replace(self, node):
         """Try to find replace node for current node.
 
@@ -285,6 +407,8 @@ class AutoStructify(transforms.Transform):
             newnode = self.auto_code_block(node)
         elif isinstance(node, nodes.literal):
             newnode = self.auto_inline_code(node)
+        elif isinstance(node, nodes.paragraph) and node.rawsource.startswith('|') and node.rawsource.endswith('|'):
+            newnode = self.table_extension(node)
         return newnode
 
     def traverse(self, node):
