@@ -21,16 +21,16 @@ def setup(app):
     app.add_transform(AutoStructify)
 
 ```
-All the features are by default enabled
 
 ***List of options***
-* __enable_auto_toc_tree__: whether enable [Auto Toc Tree](#auto-toc-tree) feature.
-* __auto_toc_tree_section__: when enabled,  [Auto Toc Tree](#auto-toc-tree) will only be enabled on section that matches the title.
-* __enable_auto_doc_ref__: whether enable [Auto Doc Ref](#auto-doc-ref) feature.
-* __enable_math__: whether enable [Math Formula](#math-formula)
-* __enable_inline_math__: whether enable [Inline Math](#inline-math)
-* __enable_eval_rst__: whether [Embed reStructuredText](#embed-restructuredtext) is enabled.
-* __url_resolver__: a function that maps a existing relative position in the document to a http link
+* __enable_auto_toc_tree__: whether enable [Auto Toc Tree](#auto-toc-tree) feature. (enabled by default)
+* __auto_toc_tree_section__: when enabled,  [Auto Toc Tree](#auto-toc-tree) will only be enabled on section that matches the title. (enabled by default)
+* __enable_auto_doc_ref__: whether enable [Auto Doc Ref](#auto-doc-ref) feature. (enabled by default)
+* __enable_math__: whether enable [Math Formula](#math-formula) (enabled by default)
+* __enable_inline_math__: whether enable [Inline Math](#inline-math) (enabled by default)
+* __enable_eval_rst__: whether [Embed reStructuredText](#embed-restructuredtext) is enabled. (enabled by default)
+* __enable_table_extension__: enable basic markdown table support. (disabled by default)
+* __url_resolver__: a function that maps a existing relative position in the document to a http link (enabled by default)
 
 Auto Toc Tree
 -------------
@@ -235,3 +235,31 @@ This formula `$ y=\sum_{i=1}^n g(x_i) $`
 will be rendered as:
 
 This formula `$ y=\sum_{i=1}^n g(x_i) $`
+
+Table Extension
+---------------
+The table extension brings basic support for markdown tables. Currently only text and references (links) are supported
+to be used within cells.
+
+The table must comply with following syntax:
+```
+Example:
+| abc | data |
+|-----|------|
+| a   | 1    |
+
+Headers are not required:
+| abc | data |
+| a   | 1    |
+
+Cells do not need to align:
+| abc | data |
+| a | 1 |
+```
+
+Tables which use github flavoured syntax are __not supported__:
+```
+ abc | data
+-----|------
+ a   | 1
+```
