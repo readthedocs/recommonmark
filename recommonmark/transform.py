@@ -46,13 +46,13 @@ class AutoStructify(transforms.Transform):
             docpath is the absolute document path to the document, if
             the target corresponds to an internal document, this can bex None
         """
-        assert isinstance(ref, nodes.reference)
+        assert (isinstance(ref, nodes.reference) or isinstance(ref, sphinx.addnodes.pending_xref))
         title = None
         if len(ref.children) == 0:
             title = ref['name']
         elif isinstance(ref.children[0], nodes.Text):
             title = ref.children[0].astext()
-        uri = ref['refuri']
+        uri = ref['refuri'] if isinstance(ref, nodes.reference) else ref['reftarget']
         if uri.find('://') != -1:
             return (title, uri, None)
         anchor = None
@@ -170,7 +170,6 @@ class AutoStructify(transforms.Transform):
         """
         if not self.config['enable_auto_doc_ref']:
             return None
-        assert isinstance(node, nodes.reference)
         title, uri, docpath = self.parse_ref(node)
         if title is None:
             return None
@@ -279,7 +278,7 @@ class AutoStructify(transforms.Transform):
         newnode = None
         if isinstance(node, nodes.Sequential):
             newnode = self.auto_toc_tree(node)
-        elif isinstance(node, nodes.reference):
+        elif isinstance(node, nodes.reference) or isinstance(node, sphinx.addnodes.pending_xref):
             newnode = self.auto_doc_ref(node)
         elif isinstance(node, nodes.literal_block):
             newnode = self.auto_code_block(node)
