@@ -1,5 +1,6 @@
 Header
 ======
 
-A paragraph [link](link) and [absolute link](/link). An [external link](http://www.google.com).
+A paragraph [link](link), an [absolute link](/link) and a [link with file extension](link.md).
+An [external link](http://www.google.com).
 

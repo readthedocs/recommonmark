@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from recommonmark.parser import CommonMarkParser
+from recommonmark.transform import AutoStructify
 
 templates_path = ['_templates']
 source_suffix = '.md'
@@ -20,3 +21,7 @@ todo_include_todos = False
 html_theme = 'alabaster'
 html_static_path = ['_static']
 htmlhelp_basename = 'sphinxproj'
+
+
+def setup(app):
+    app.add_transform(AutoStructify)
