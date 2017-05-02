@@ -161,8 +161,8 @@ class AutoStructify(transforms.Transform):
         added by .parser.make_refnode instead of normal references."""
         ref_node = nodes.reference()
         try:
-            ref_node['name'] = node.source
-            ref_node['refuri'] = node["reftarget"]
+            ref_node.children = node.children
+            ref_node['refuri'] = node['reftarget']
             return self.auto_doc_ref(ref_node)
         except (AttributeError, KeyError):
             return None

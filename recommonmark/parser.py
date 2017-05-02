@@ -233,7 +233,7 @@ def inline_entity(inline):
 
 
 def make_refnode(label, target, has_explicit_title):
-    if target and target.startswith(('http://', 'https://')):
+    if target and target.startswith(('http://', 'https://', 'mailto:')):
         ref_node = nodes.reference()
         ref_node['name'] = label
         ref_node['refuri'] = target
