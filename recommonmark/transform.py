@@ -7,6 +7,7 @@ from docutils import nodes, transforms
 from docutils.statemachine import StringList
 from docutils.parsers.rst import Parser
 from docutils.utils import new_document
+import sphinx
 
 
 class AutoStructify(transforms.Transform):
@@ -155,6 +156,17 @@ class AutoStructify(transforms.Transform):
             options={'maxdepth': 1, 'numbered': numbered},
             content=['%s <%s>' % (k, v) for k, v in refs])
 
+    def auto_doc_ref_for_xref(self, node):
+        """Same as auto_doc_ref, but handles pending_xref
+        added by .parser.make_refnode instead of normal references."""
+        ref_node = nodes.reference()
+        try:
+            ref_node['name'] = node.source
+            ref_node['refuri'] = node["reftarget"]
+            return self.auto_doc_ref(ref_node)
+        except (AttributeError, KeyError):
+            return None
+
     def auto_doc_ref(self, node):
         """Try to convert a reference to docref in rst.
 
@@ -281,6 +293,8 @@ class AutoStructify(transforms.Transform):
             newnode = self.auto_toc_tree(node)
         elif isinstance(node, nodes.reference):
             newnode = self.auto_doc_ref(node)
+        elif isinstance(node, sphinx.addnodes.pending_xref):
+            newnode = self.auto_doc_ref_for_xref(node)
         elif isinstance(node, nodes.literal_block):
             newnode = self.auto_code_block(node)
         elif isinstance(node, nodes.literal):
