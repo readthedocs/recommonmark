@@ -23,7 +23,7 @@ pip install recommonmark
 
 Then add this to your Sphinx conf.py:
 
-```
+```python
 from recommonmark.parser import CommonMarkParser
 
 source_parsers = {
