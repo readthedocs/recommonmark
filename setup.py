@@ -17,7 +17,7 @@ setup(
     install_requires=[
         'commonmark>=0.7.3',
         'docutils>=0.11',
-        'sphinx>=1.3.1',
+        'sphinx>=1.5,<1.6',
     ],
     entry_points={'console_scripts': [
         'cm2html = recommonmark.scripts:cm2html',
