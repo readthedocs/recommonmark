@@ -61,10 +61,11 @@ class CommonMarkParser(parsers.Parser):
         """
         if mdnode.is_container():
             fn_name = 'visit_{0}'.format(mdnode.t)
-            if not hasattr(self, fn_name):
-                warn("Container node skipped: type={0}".format(mdnode.t))
+            parent = self.current_node.parent
+            if not hasattr(self, fn_name) and parent is not None:
+                warn("Container node skipped: type={0} src={1} line={2}".format(mdnode.t, parent.source, parent.line))
             else:
-                self.current_node = self.current_node.parent
+                self.current_node = parent
 
     def visit_heading(self, mdnode):
         # Test if we're replacing a section level first
