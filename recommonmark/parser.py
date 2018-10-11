@@ -6,7 +6,7 @@ from os.path import splitext
 from docutils import parsers, nodes
 from sphinx import addnodes
 
-from CommonMark import Parser
+from commonmark import Parser
 
 from warnings import warn
 
@@ -230,6 +230,12 @@ class CommonMarkParser(parsers.Parser):
         if mdnode.sourcepos is not None:
             raw_node.line = mdnode.sourcepos[0][0]
         self.current_node.append(raw_node)
+
+    def visit_html_inline(self, mdnode):
+        self.visit_html(mdnode)
+
+    def visit_html_block(self, mdnode):
+        self.visit_html(mdnode)
 
     def visit_thematic_break(self, _):
         self.current_node.append(nodes.transition())
