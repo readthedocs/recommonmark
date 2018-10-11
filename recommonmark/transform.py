@@ -205,12 +205,14 @@ class AutoStructify(transforms.Transform):
             if not self.config['enable_inline_math']:
                 return None
             content = content[1:-1]
-            self.state_machine.reset(self.document,
-                                     node.parent,
-                                     self.current_level)
-            return self.state_machine.run_role('math', content=content)
-        else:
-            return None
+            if content:
+                self.state_machine.reset(self.document,
+                                         node.parent,
+                                         self.current_level)
+                # Properly allow rst to get the raw content
+                math_content = '`%s`' % content
+                return self.state_machine.run_role('math', content=math_content)
+        return None
 
     def auto_code_block(self, node):
         """Try to automatically generate nodes for codeblock syntax.
