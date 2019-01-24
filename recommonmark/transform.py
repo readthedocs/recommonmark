@@ -1,5 +1,6 @@
 """Implement some common transforms on parsed AST."""
 
+import copy
 import os
 import re
 
@@ -41,11 +42,10 @@ class AutoStructify(transforms.Transform):
     def __init__(self, *args, **kwargs):
         transforms.Transform.__init__(self, *args, **kwargs)
         self.reporter = self.document.reporter
-        self.config = self.default_config.copy()
-        self.config['auto_code_block_transformers'] = \
-            dict(self.config['auto_code_block_transformers'])
+        self.config = copy.deepcopy(self.default_config)
         try:
-            new_cfg = self.document.settings.env.config.recommonmark_config
+            new_cfg = copy.deepcopy(
+                self.document.settings.env.config.recommonmark_config)
             custom_transformers = new_cfg.pop(
                 'auto_code_block_transformers', {})
             self.config.update(new_cfg)
