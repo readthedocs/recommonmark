@@ -12,6 +12,25 @@ from sphinx import addnodes
 from .states import DummyStateMachine
 
 
+# this transforms code blocks of ```math ...
+def auto_code_block_math(autostructify, node):
+    if autostructify.config['enable_math']:
+        content = node.rawsource.split('\n')
+        return autostructify.state_machine.run_directive(
+            'math', content=content)
+
+
+def auto_code_block_eval_rst(autostructify, node):
+    if autostructify.config['enable_eval_rst']:
+        # allow embed non section level rst
+        content = node.rawsource.split('\n')
+        new_node = nodes.section()
+        autostructify.state_machine.state.nested_parse(
+            StringList(content, source=node.source),
+            0, node=new_node, match_titles=True)
+        return new_node.children[:]
+
+
 class AutoStructify(transforms.Transform):
 
     """Automatically try to transform blocks to sphinx directives.
@@ -23,9 +42,15 @@ class AutoStructify(transforms.Transform):
         transforms.Transform.__init__(self, *args, **kwargs)
         self.reporter = self.document.reporter
         self.config = self.default_config.copy()
+        self.config['auto_code_block_transformers'] = \
+            dict(self.config['auto_code_block_transformers'])
         try:
             new_cfg = self.document.settings.env.config.recommonmark_config
+            custom_transformers = new_cfg.pop(
+                'auto_code_block_transformers', {})
             self.config.update(new_cfg)
+            self.config['auto_code_block_transformers'].update(
+                custom_transformers)
         except AttributeError:
             pass
 
@@ -47,6 +72,10 @@ class AutoStructify(transforms.Transform):
         'enable_math': True,
         'enable_inline_math': True,
         'commonmark_suffixes': ['.md'],
+        'auto_code_block_transformers': {
+            'math': auto_code_block_math,
+            'eval_rst': auto_code_block_eval_rst,
+        },
         'url_resolver': lambda x: x,
     }
 
@@ -225,26 +254,20 @@ class AutoStructify(transforms.Transform):
             The converted toc tree node, None if conversion is not possible.
         """
         assert isinstance(node, nodes.literal_block)
-        original_node = node
         if 'language' not in node:
             return None
         self.state_machine.reset(self.document,
                                  node.parent,
                                  self.current_level)
         content = node.rawsource.split('\n')
-        language = node['language']
-        if language == 'math':
-            if self.config['enable_math']:
-                return self.state_machine.run_directive(
-                    'math', content=content)
-        elif language == 'eval_rst':
-            if self.config['enable_eval_rst']:
-                # allow embed non section level rst
-                node = nodes.section()
-                self.state_machine.state.nested_parse(
-                    StringList(content, source=original_node.source),
-                    0, node=node, match_titles=True)
-                return node.children[:]
+        # in atom editor while using markdown-preview-enhanced
+        # parameters for the code renderer is given in curly braces,
+        # e.g. ```plantuml  {align=center}
+        language = node['language'].strip().split(" ").pop(0)
+        transformers = self.config['auto_code_block_transformers']
+        if language in transformers:
+            handler = transformers[language]
+            return handler(self, node)
         else:
             match = re.search('[ ]?[\w_-]+::.*', language)
             if match:

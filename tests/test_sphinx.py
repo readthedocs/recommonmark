@@ -177,9 +177,16 @@ class GenericTests(SphinxIntegrationTests):
 
 class CodeBlockTests(unittest.TestCase):
 
-    def test_integration(self):
+    def test_integration_code_block(self):
         with sphinx_built_file('sphinx_code_block', '_build/text/index.html') as output:
             self.assertIn('<div class="highlight">', output)
+
+    def test_integration_sphinx_code_block_custom_language_transformer(self):
+        with sphinx_built_file(
+                'sphinx_code_block_custom_language_transformer',
+                '_build/text/index.html') as output:
+            self.assertIn(
+                '&#64;startuml\nAlice -&gt; Bob\n&#64;enduml', output)
 
 
 class IndentedCodeTests(unittest.TestCase):

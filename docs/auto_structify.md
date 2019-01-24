@@ -31,6 +31,7 @@ All the features are by default enabled
 * __enable_inline_math__: whether enable [Inline Math](#inline-math)
 * __enable_eval_rst__: whether [Embed reStructuredText](#embed-restructuredtext) is enabled.
 * __url_resolver__: a function that maps a existing relative position in the document to a http link
+* __auto_code_block_transformers__: a dict of code block language to transformer function, see [Add custom code block language transformer](#add-custom-code-block-language-transformer)
 
 Auto Toc Tree
 -------------
@@ -228,6 +229,45 @@ The `<div style="clear: right;"></div>` line clears the sidebar for the next tit
 
 <div style="clear: right;"></div>
 
+### Add custom code block language transformer
+For some use cases it may be desirable to implement
+a custom transformer. Users of the Atom editor often use the
+[Markdown Preview Enhanced](https://github.com/shd101wyy/markdown-preview-enhanced)
+extention which renders a live preview of the markdown document. This extention
+embeds e.g. plantuml diagrams in this form:
+
+````rst
+```plantuml {align=center}
+@startuml
+Alice -> Bob
+@enduml
+```
+````
+
+To use this form in sphinx via recommonmark you first have
+to install sphinxcontrib-plantuml (`pip install sphinxcontrib-plantuml`) and
+enable it in sphinx conf.py via `extensions.append('sphinxcontrib.plantuml')`.
+
+At least implement and register a custom plantuml lanauge transformer function:
+
+```python
+# at the end of conf.py
+def transform_atom_markdown_plantuml(autostructify, node):
+    # for details see tests/sphinx_code_block_custom_language_transformer
+    pass
+
+def setup(app):
+    app.add_config_value(
+        'recommonmark_config',
+        {
+            'auto_code_block_transformers': {
+                'plantuml': transform_atom_markdown_plantuml
+            },
+        },
+        True
+    )
+    app.add_transform(AutoStructify)
+```
 
 Inline Math
 -----------
