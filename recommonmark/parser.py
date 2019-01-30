@@ -10,6 +10,9 @@ from commonmark import Parser
 
 from warnings import warn
 
+from markdown import markdown
+from html.parser import HTMLParser
+
 if sys.version_info < (3, 0):
     from urlparse import urlparse
 else:
@@ -35,18 +38,213 @@ class CommonMarkParser(parsers.Parser):
         self.setup_sections()
         parser = Parser()
         ast = parser.parse(inputstring + '\n')
+        html = markdown(inputstring + '\n', extensions=[
+            'extra',
+            'abbr',
+            'attr_list',
+            'def_list',
+            'fenced_code',
+            'footnotes',
+            'tables',
+            'admonition',
+            'codehilite',
+            'meta',
+            'nl2br',
+            'sane_lists',
+            'smarty',
+            'toc',
+            'wikilinks'
+        ])
+        self.convert_html(html)
         self.convert_ast(ast)
         self.finish_parse()
+
+    def convert_html(self, html):
+        class MyHTMLParser(HTMLParser):
+            def handle_starttag(_, tag, attrs):
+                fn_name = '_visit_' + tag
+                fn = getattr(self, fn_name)
+                fn(attrs)
+            def handle_endtag(_, tag):
+                fn_name = '_depart_' + tag
+                fn = getattr(self, fn_name)
+                fn()
+            def handle_data(_, data):
+                self._visit_text(data)
+                self._depart_text()
+        self._visit_document()
+        parser = MyHTMLParser()
+        parser.feed(html)
+        self._depart_document()
 
     def convert_ast(self, ast):
         for (node, entering) in ast.walker():
             fn_prefix = "visit" if entering else "depart"
             fn_name = "{0}_{1}".format(fn_prefix, node.t.lower())
             fn_default = "default_{0}".format(fn_prefix)
+            print(fn_name)
             fn = getattr(self, fn_name, None)
             if fn is None:
                 fn = getattr(self, fn_default)
             fn(node)
+
+
+    def _visit_document(self):
+        print('visit document')
+
+    def _depart_document(self):
+        print('depart document')
+
+    def _visit_p(self, attrs):
+        print('visit p')
+
+    def _depart_p(self):
+        print('depart p')
+
+    def _visit_text(self, data):
+        print('visit text')
+
+    def _depart_text(self):
+        print('depart text')
+
+    def _visit_h1(self, data):
+        print('visit h1')
+
+    def _depart_h1(self):
+        print('depart h1')
+
+    def _visit_h2(self, data):
+        print('visit h2')
+
+    def _depart_h2(self):
+        print('depart h2')
+
+    def _visit_h3(self, data):
+        print('visit h3')
+
+    def _depart_h3(self):
+        print('depart h3')
+
+    def _visit_h4(self, data):
+        print('visit h4')
+
+    def _depart_h4(self):
+        print('depart h4')
+
+    def _visit_h5(self, data):
+        print('visit h5')
+
+    def _depart_h5(self):
+        print('depart h5')
+
+    def _visit_h6(self, data):
+        print('visit h6')
+
+    def _depart_h6(self):
+        print('depart h6')
+
+    def _visit_a(self, data):
+        print('visit a')
+
+    def _depart_a(self):
+        print('depart a')
+
+    def _visit_img(self, data):
+        print('visit img')
+
+    def _depart_img(self):
+        print('depart img')
+
+    def _visit_ul(self, data):
+        print('visit ul')
+
+    def _depart_ul(self):
+        print('depart ul')
+
+    def _visit_ol(self, data):
+        print('visit ol')
+
+    def _depart_ol(self):
+        print('depart ol')
+
+    def _visit_li(self, data):
+        print('visit li')
+
+    def _depart_li(self):
+        print('depart li')
+
+    def _visit_table(self, data):
+        print('visit table')
+
+    def _depart_table(self):
+        print('depart table')
+
+    def _visit_thead(self, data):
+        print('visit thead')
+
+    def _depart_thead(self):
+        print('depart thead')
+
+    def _visit_tbody(self, data):
+        print('visit tbody')
+
+    def _depart_tbody(self):
+        print('depart tbody')
+
+    def _visit_tr(self, data):
+        print('visit tr')
+
+    def _depart_tr(self):
+        print('depart tr')
+
+    def _visit_th(self, data):
+        print('visit th')
+
+    def _depart_th(self):
+        print('depart th')
+
+    def _visit_td(self, data):
+        print('visit td')
+
+    def _depart_td(self):
+        print('depart td')
+
+    def _visit_div(self, data):
+        print('visit div')
+
+    def _depart_div(self):
+        print('depart div')
+
+    def _visit_pre(self, data):
+        print('visit pre')
+
+    def _depart_pre(self):
+        print('depart pre')
+
+    def _visit_span(self, data):
+        print('visit span')
+
+    def _depart_span(self):
+        print('depart span')
+
+    def _visit_blockquote(self, data):
+        print('visit blockquote')
+
+    def _depart_blockquote(self):
+        print('depart blockquote')
+
+    def _visit_hr(self, data):
+        print('visit hr')
+
+    def _depart_hr(self):
+        print('depart hr')
+
+    def _visit_br(self, data):
+        print('visit br')
+
+    def _depart_br(self):
+        print('depart br')
+
 
     # Node type enter/exit handlers
     def default_visit(self, mdnode):
