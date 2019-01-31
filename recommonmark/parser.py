@@ -29,6 +29,8 @@ class CommonMarkParser(parsers.Parser):
 
     supported = ('md', 'markdown')
     translate_section_name = None
+    level = 0
+    wrap_text = None
 
     def __init__(self):
         self._level_to_elem = {}
@@ -90,13 +92,25 @@ class CommonMarkParser(parsers.Parser):
                 fn = getattr(self, fn_default)
             fn(node)
 
-
-    def _visit_section(self):
+    def _visit_section(self, level, attrs):
+        for i in range(self.level - level + 1):
+            self._depart_section(level)
+        self.level = level
+        section = nodes.section()
+        id_attr = _.find(attrs, lambda attr:attr[0]=='id')[1]
+        section['ids'] = id_attr
+        section['names'] = id_attr
+        title = nodes.title()
+        self.wrap_text = title
+        section.append(title)
+        self.current_node.append(section)
+        self.current_node = section
         print('visit section')
 
-    def _depart_section(self):
+    def _depart_section(self, level):
+        if (self.current_node.parent):
+            self.current_node = self.current_node.parent
         print('depart section')
-
 
     def _visit_document(self):
         print('visit document')
@@ -116,60 +130,60 @@ class CommonMarkParser(parsers.Parser):
 
     def _visit_text(self, data):
         text = nodes.Text(data)
-        self.current_node.append(text)
-        self.current_node = text
-        print('visit text')
+        if (self.wrap_text):
+            self.wrap_text.append(text)
+        else:
+            self.current_node.append(text)
+            self.current_node = text
+            print('visit text')
 
     def _depart_text(self):
-        self.current_node = self.current_node.parent
-        print('depart text')
+        if (self.wrap_text):
+            self.wrap_text = None
+        else:
+            self.current_node = self.current_node.parent
+            print('depart text')
 
-    def _visit_h1(self, data):
-        self._visit_section()
+    def _visit_h1(self, attrs):
+        self._visit_section(1, attrs)
         print('visit h1')
 
     def _depart_h1(self):
-        self._depart_section()
         print('depart h1')
 
-    def _visit_h2(self, data):
-        self._visit_section()
+    def _visit_h2(self, attrs):
+        self._visit_section(2, attrs)
         print('visit h2')
 
     def _depart_h2(self):
-        self._depart_section()
         print('depart h2')
 
-    def _visit_h3(self, data):
-        self._visit_section()
+    def _visit_h3(self, attrs):
+        self._visit_section(3, attrs)
         print('visit h3')
 
     def _depart_h3(self):
-        self._depart_section()
         print('depart h3')
 
-    def _visit_h4(self, data):
-        self._visit_section()
+    def _visit_h4(self, attrs):
+        self._visit_section(4, attrs)
         print('visit h4')
 
     def _depart_h4(self):
-        self._depart_section()
         print('depart h4')
 
-    def _visit_h5(self, data):
-        self._visit_section()
+    def _visit_h5(self, attrs):
+        self._visit_section(5, attrs)
         print('visit h5')
 
     def _depart_h5(self):
-        self._depart_section()
         print('depart h5')
 
-    def _visit_h6(self, data):
-        self._visit_section()
+    def _visit_h6(self, attrs):
+        self._visit_section(6, attrs)
         print('visit h6')
 
     def _depart_h6(self):
-        self._depart_section()
         print('depart h6')
 
     def _visit_a(self, attrs):
@@ -183,97 +197,97 @@ class CommonMarkParser(parsers.Parser):
         self.current_node = self.current_node.parent
         print('depart a')
 
-    def _visit_img(self, data):
+    def _visit_img(self, attrs):
         print('visit img')
 
     def _depart_img(self):
         print('depart img')
 
-    def _visit_ul(self, data):
+    def _visit_ul(self, attrs):
         print('visit ul')
 
     def _depart_ul(self):
         print('depart ul')
 
-    def _visit_ol(self, data):
+    def _visit_ol(self, attrs):
         print('visit ol')
 
     def _depart_ol(self):
         print('depart ol')
 
-    def _visit_li(self, data):
+    def _visit_li(self, attrs):
         print('visit li')
 
     def _depart_li(self):
         print('depart li')
 
-    def _visit_table(self, data):
+    def _visit_table(self, attrs):
         print('visit table')
 
     def _depart_table(self):
         print('depart table')
 
-    def _visit_thead(self, data):
+    def _visit_thead(self, attrs):
         print('visit thead')
 
     def _depart_thead(self):
         print('depart thead')
 
-    def _visit_tbody(self, data):
+    def _visit_tbody(self, attrs):
         print('visit tbody')
 
     def _depart_tbody(self):
         print('depart tbody')
 
-    def _visit_tr(self, data):
+    def _visit_tr(self, attrs):
         print('visit tr')
 
     def _depart_tr(self):
         print('depart tr')
 
-    def _visit_th(self, data):
+    def _visit_th(self, attrs):
         print('visit th')
 
     def _depart_th(self):
         print('depart th')
 
-    def _visit_td(self, data):
+    def _visit_td(self, attrs):
         print('visit td')
 
     def _depart_td(self):
         print('depart td')
 
-    def _visit_div(self, data):
+    def _visit_div(self, attrs):
         print('visit div')
 
     def _depart_div(self):
         print('depart div')
 
-    def _visit_pre(self, data):
+    def _visit_pre(self, attrs):
         print('visit pre')
 
     def _depart_pre(self):
         print('depart pre')
 
-    def _visit_span(self, data):
+    def _visit_span(self, attrs):
         print('visit span')
 
     def _depart_span(self):
         print('depart span')
 
-    def _visit_blockquote(self, data):
+    def _visit_blockquote(self, attrs):
         print('visit blockquote')
 
     def _depart_blockquote(self):
         print('depart blockquote')
 
-    def _visit_hr(self, data):
+    def _visit_hr(self, attrs):
         print('visit hr')
 
     def _depart_hr(self):
         print('depart hr')
 
-    def _visit_br(self, data):
+    def _visit_br(self, attrs):
         print('visit br')
 
     def _depart_br(self):

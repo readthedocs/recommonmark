@@ -25,29 +25,22 @@ class TestParsing(unittest.TestCase):
     def test_heading(self):
         self.assertParses(
             """
-            ---
-            ___
-
-            # h1
-
-            ## h2
-
-
-            [Google](https://google.com)
-
-            ## h22
-
-            one
-            two
-
-            three
-            four
-
+            # I
+            ## A
+            ### 1
             """,
             """
             <?xml version="1.0" ?>
             <document source="&lt;string&gt;">
-              <paragraph>hi</paragraph>
+              <section ids="i" names="i">
+                <title>I</title>
+                <section ids="a" names="a">
+                  <title>A</title>
+                  <section ids="1" names="1">
+                    <title>1</title>
+                  </section>
+                </section>
+              </section>
             </document>
             """
         )
