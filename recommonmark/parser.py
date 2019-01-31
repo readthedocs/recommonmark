@@ -3,6 +3,8 @@
 import sys
 from os.path import splitext
 
+import pydash as _
+
 from docutils import parsers, nodes
 from sphinx import addnodes
 
@@ -56,7 +58,7 @@ class CommonMarkParser(parsers.Parser):
             'wikilinks'
         ])
         self.convert_html(html)
-        self.convert_ast(ast)
+        # self.convert_ast(ast)
         self.finish_parse()
 
     def convert_html(self, html):
@@ -89,6 +91,13 @@ class CommonMarkParser(parsers.Parser):
             fn(node)
 
 
+    def _visit_section(self):
+        print('visit section')
+
+    def _depart_section(self):
+        print('depart section')
+
+
     def _visit_document(self):
         print('visit document')
 
@@ -96,57 +105,82 @@ class CommonMarkParser(parsers.Parser):
         print('depart document')
 
     def _visit_p(self, attrs):
+        paragraph = nodes.paragraph()
+        self.current_node.append(paragraph)
+        self.current_node = paragraph
         print('visit p')
 
     def _depart_p(self):
+        self.current_node = self.current_node.parent
         print('depart p')
 
     def _visit_text(self, data):
+        text = nodes.Text(data)
+        self.current_node.append(text)
+        self.current_node = text
         print('visit text')
 
     def _depart_text(self):
+        self.current_node = self.current_node.parent
         print('depart text')
 
     def _visit_h1(self, data):
+        self._visit_section()
         print('visit h1')
 
     def _depart_h1(self):
+        self._depart_section()
         print('depart h1')
 
     def _visit_h2(self, data):
+        self._visit_section()
         print('visit h2')
 
     def _depart_h2(self):
+        self._depart_section()
         print('depart h2')
 
     def _visit_h3(self, data):
+        self._visit_section()
         print('visit h3')
 
     def _depart_h3(self):
+        self._depart_section()
         print('depart h3')
 
     def _visit_h4(self, data):
+        self._visit_section()
         print('visit h4')
 
     def _depart_h4(self):
+        self._depart_section()
         print('depart h4')
 
     def _visit_h5(self, data):
+        self._visit_section()
         print('visit h5')
 
     def _depart_h5(self):
+        self._depart_section()
         print('depart h5')
 
     def _visit_h6(self, data):
+        self._visit_section()
         print('visit h6')
 
     def _depart_h6(self):
+        self._depart_section()
         print('depart h6')
 
-    def _visit_a(self, data):
+    def _visit_a(self, attrs):
+        reference = nodes.reference()
+        reference['refuri'] = _.find(attrs, lambda i: i[0] == 'href')[1]
+        self.current_node.append(reference)
+        self.current_node = reference
         print('visit a')
 
     def _depart_a(self):
+        self.current_node = self.current_node.parent
         print('depart a')
 
     def _visit_img(self, data):
