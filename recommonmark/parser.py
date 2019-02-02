@@ -235,40 +235,52 @@ class CommonMarkParser(parsers.Parser):
         self.current_node = self.current_node.parent
 
     def _visit_table(self, attrs):
-        pass
+        table = nodes.table()
+        self.current_node.append(table)
+        self.current_node = table
 
     def _depart_table(self):
-        pass
+        self.current_node = self.current_node.parent
 
     def _visit_thead(self, attrs):
-        pass
+        thead = nodes.thead()
+        self.current_node.append(thead)
+        self.current_node = thead
 
     def _depart_thead(self):
-        pass
+        self.current_node = self.current_node.parent
 
     def _visit_tbody(self, attrs):
-        pass
+        tbody = nodes.tbody()
+        self.current_node.append(tbody)
+        self.current_node = tbody
 
     def _depart_tbody(self):
-        pass
+        self.current_node = self.current_node.parent
 
     def _visit_tr(self, attrs):
-        pass
+        row = nodes.row()
+        self.current_node.append(row)
+        self.current_node = row
 
     def _depart_tr(self):
-        pass
+        self.current_node = self.current_node.parent
 
     def _visit_th(self, attrs):
-        pass
+        entry = nodes.entry()
+        self.current_node.append(entry)
+        self.current_node = entry
 
     def _depart_th(self):
-        pass
+        self.current_node = self.current_node.parent
 
     def _visit_td(self, attrs):
-        pass
+        entry = nodes.entry()
+        self.current_node.append(entry)
+        self.current_node = entry
 
     def _depart_td(self):
-        pass
+        self.current_node = self.current_node.parent
 
     def _visit_div(self, attrs):
         pass
@@ -297,16 +309,20 @@ class CommonMarkParser(parsers.Parser):
         self.current_node = self.current_node.parent
 
     def _visit_hr(self, attrs):
-        pass
+        transition = nodes.transition()
+        self.current_node.append(transition)
+        self.current_node = transition
 
     def _depart_hr(self):
-        pass
+        self.current_node = self.current_node.parent
 
     def _visit_br(self, attrs):
-        pass
+        text = nodes.Text('\n')
+        self.current_node.append(text)
+        self.current_node = text
 
     def _depart_br(self):
-        pass
+        self.current_node = self.current_node.parent
 
 
     # Node type enter/exit handlers

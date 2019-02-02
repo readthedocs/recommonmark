@@ -42,6 +42,12 @@ class TestParsing(unittest.TestCase):
 
             1. ONE
             2. TWO
+
+            ---
+
+            | one | two |
+            | --- | --- |
+            | ONE | TWO |
             """,
             """
             <?xml version="1.0" ?>
@@ -80,6 +86,21 @@ class TestParsing(unittest.TestCase):
                       <paragraph>TWO</paragraph>
                     </list_item>
                   </enumerated_list>
+                  <transition/>
+                  <table>
+                    <thead>
+                      <row>
+                        <entry>one</entry>
+                        <entry>two</entry>
+                      </row>
+                    </thead>
+                    <tbody>
+                      <row>
+                        <entry>ONE</entry>
+                        <entry>TWO</entry>
+                      </row>
+                    </tbody>
+                  </table>
                 </section>
               </section>
             </document>
