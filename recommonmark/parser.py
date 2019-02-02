@@ -30,7 +30,6 @@ class CommonMarkParser(parsers.Parser):
     supported = ('md', 'markdown')
     translate_section_name = None
     level = 0
-    wrap_text = None
 
     def __init__(self):
         self._level_to_elem = {}
@@ -59,11 +58,15 @@ class CommonMarkParser(parsers.Parser):
             'toc',
             'wikilinks'
         ])
+        print(html)
         self.convert_html(html)
         # self.convert_ast(ast)
         self.finish_parse()
+        print('----------------------')
+        print(self.document)
 
     def convert_html(self, html):
+        html = html.replace('\n', '')
         class MyHTMLParser(HTMLParser):
             def handle_starttag(_, tag, attrs):
                 fn_name = '_visit_' + tag
@@ -86,7 +89,6 @@ class CommonMarkParser(parsers.Parser):
             fn_prefix = "visit" if entering else "depart"
             fn_name = "{0}_{1}".format(fn_prefix, node.t.lower())
             fn_default = "default_{0}".format(fn_prefix)
-            print(fn_name)
             fn = getattr(self, fn_name, None)
             if fn is None:
                 fn = getattr(self, fn_default)
@@ -101,197 +103,196 @@ class CommonMarkParser(parsers.Parser):
         section['ids'] = id_attr
         section['names'] = id_attr
         title = nodes.title()
-        self.wrap_text = title
         section.append(title)
         self.current_node.append(section)
         self.current_node = section
-        print('visit section')
 
     def _depart_section(self, level):
         if (self.current_node.parent):
             self.current_node = self.current_node.parent
-        print('depart section')
 
     def _visit_document(self):
-        print('visit document')
+        pass
 
     def _depart_document(self):
-        print('depart document')
+        pass
 
     def _visit_p(self, attrs):
         paragraph = nodes.paragraph()
         self.current_node.append(paragraph)
         self.current_node = paragraph
-        print('visit p')
 
     def _depart_p(self):
         self.current_node = self.current_node.parent
-        print('depart p')
 
     def _visit_text(self, data):
         text = nodes.Text(data)
-        if (self.wrap_text):
-            self.wrap_text.append(text)
-        else:
-            self.current_node.append(text)
-            self.current_node = text
-            print('visit text')
+        if isinstance(self.current_node, nodes.section) and len(self.current_node.children) > 0:
+            title = self.current_node.children[0]
+            if isinstance(title, nodes.title):
+                title.append(text)
+                self.current_node = title
+                return None
+        elif isinstance(self.current_node, nodes.title) and len(self.current_node.children) > 0:
+            reference = self.current_node.children[0]
+            if isinstance(reference, nodes.reference):
+                reference.append(text)
+                self.current_node = reference
+                return None
+        self.current_node.append(text)
+        self.current_node = text
 
     def _depart_text(self):
-        if (self.wrap_text):
-            self.wrap_text = None
-        else:
-            self.current_node = self.current_node.parent
-            print('depart text')
+        self.current_node = self.current_node.parent
 
     def _visit_h1(self, attrs):
         self._visit_section(1, attrs)
-        print('visit h1')
 
     def _depart_h1(self):
-        print('depart h1')
+        pass
 
     def _visit_h2(self, attrs):
         self._visit_section(2, attrs)
-        print('visit h2')
 
     def _depart_h2(self):
-        print('depart h2')
+        pass
 
     def _visit_h3(self, attrs):
         self._visit_section(3, attrs)
-        print('visit h3')
 
     def _depart_h3(self):
-        print('depart h3')
+        pass
 
     def _visit_h4(self, attrs):
         self._visit_section(4, attrs)
-        print('visit h4')
 
     def _depart_h4(self):
-        print('depart h4')
+        pass
 
     def _visit_h5(self, attrs):
         self._visit_section(5, attrs)
-        print('visit h5')
 
     def _depart_h5(self):
-        print('depart h5')
+        pass
 
     def _visit_h6(self, attrs):
         self._visit_section(6, attrs)
-        print('visit h6')
 
     def _depart_h6(self):
-        print('depart h6')
+        pass
 
     def _visit_a(self, attrs):
         reference = nodes.reference()
         reference['refuri'] = _.find(attrs, lambda i: i[0] == 'href')[1]
+        if isinstance(self.current_node, nodes.section) and len(self.current_node.children) > 0:
+            title = self.current_node.children[0]
+            if isinstance(title, nodes.title):
+                title.append(reference)
+                self.current_node = title
+                return None
         self.current_node.append(reference)
         self.current_node = reference
-        print('visit a')
 
     def _depart_a(self):
         self.current_node = self.current_node.parent
-        print('depart a')
 
     def _visit_img(self, attrs):
-        print('visit img')
+        pass
 
     def _depart_img(self):
-        print('depart img')
+        pass
 
     def _visit_ul(self, attrs):
-        print('visit ul')
+        pass
 
     def _depart_ul(self):
-        print('depart ul')
+        pass
 
     def _visit_ol(self, attrs):
-        print('visit ol')
+        pass
 
     def _depart_ol(self):
-        print('depart ol')
+        pass
 
     def _visit_li(self, attrs):
-        print('visit li')
+        pass
 
     def _depart_li(self):
-        print('depart li')
+        pass
 
     def _visit_table(self, attrs):
-        print('visit table')
+        pass
 
     def _depart_table(self):
-        print('depart table')
+        pass
 
     def _visit_thead(self, attrs):
-        print('visit thead')
+        pass
 
     def _depart_thead(self):
-        print('depart thead')
+        pass
 
     def _visit_tbody(self, attrs):
-        print('visit tbody')
+        pass
 
     def _depart_tbody(self):
-        print('depart tbody')
+        pass
 
     def _visit_tr(self, attrs):
-        print('visit tr')
+        pass
 
     def _depart_tr(self):
-        print('depart tr')
+        pass
 
     def _visit_th(self, attrs):
-        print('visit th')
+        pass
 
     def _depart_th(self):
-        print('depart th')
+        pass
 
     def _visit_td(self, attrs):
-        print('visit td')
+        pass
 
     def _depart_td(self):
-        print('depart td')
+        pass
 
     def _visit_div(self, attrs):
-        print('visit div')
+        pass
 
     def _depart_div(self):
-        print('depart div')
+        pass
 
     def _visit_pre(self, attrs):
-        print('visit pre')
+        pass
 
     def _depart_pre(self):
-        print('depart pre')
+        pass
 
     def _visit_span(self, attrs):
-        print('visit span')
+        pass
 
     def _depart_span(self):
-        print('depart span')
+        pass
 
     def _visit_blockquote(self, attrs):
-        print('visit blockquote')
+        block_quote = nodes.block_quote()
+        self.current_node.append(block_quote)
+        self.current_node = block_quote
 
     def _depart_blockquote(self):
-        print('depart blockquote')
+        self.current_node = self.current_node.parent
 
     def _visit_hr(self, attrs):
-        print('visit hr')
+        pass
 
     def _depart_hr(self):
-        print('depart hr')
+        pass
 
     def _visit_br(self, attrs):
-        print('visit br')
+        pass
 
     def _depart_br(self):
-        print('depart br')
+        pass
 
 
     # Node type enter/exit handlers

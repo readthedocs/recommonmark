@@ -26,8 +26,14 @@ class TestParsing(unittest.TestCase):
         self.assertParses(
             """
             # I
+
             ## A
-            ### 1
+
+            > some-blockquote
+
+            [google](https://www.google.com)
+
+            ## [B](#b)
             """,
             """
             <?xml version="1.0" ?>
@@ -36,9 +42,17 @@ class TestParsing(unittest.TestCase):
                 <title>I</title>
                 <section ids="a" names="a">
                   <title>A</title>
-                  <section ids="1" names="1">
-                    <title>1</title>
-                  </section>
+                  <block_quote>
+                    <paragraph>some-blockquote</paragraph>
+                  </block_quote>
+                  <paragraph>
+                    <reference refuri="https://www.google.com">google</reference>
+                  </paragraph>
+                </section>
+                <section ids="b" names="b">
+                  <title>
+                    <reference refuri="#b">B</reference>
+                  </title>
                 </section>
               </section>
             </document>
