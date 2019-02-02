@@ -3,10 +3,19 @@ API Reference
 This document is for developers of recommonmark, it contans the API functions
 
 
-Parser Component
+CommonMark Parser Component
 ----------------
 ```eval_rst
 .. autoclass:: recommonmark.parser.CommonMarkParser
+    :members:
+    :show-inheritance:
+
+```
+
+Markdown Parser Component
+----------------
+```eval_rst
+.. autoclass:: recommonmark.parser.MarkdownParser
     :members:
     :show-inheritance:
 

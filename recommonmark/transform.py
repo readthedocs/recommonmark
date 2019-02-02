@@ -40,13 +40,14 @@ class AutoStructify(transforms.Transform):
     suffix_set = set(['md', 'rst'])
 
     default_config = {
-        'enable_auto_doc_ref': False,
         'auto_toc_tree_section': None,
+        'commonmark_suffixes': ['.md'],
+        'enable_auto_doc_ref': False,
         'enable_auto_toc_tree': True,
         'enable_eval_rst': True,
-        'enable_math': True,
         'enable_inline_math': True,
-        'commonmark_suffixes': ['.md'],
+        'enable_math': True,
+        'parser': 'CommonMark',
         'url_resolver': lambda x: x,
     }
 

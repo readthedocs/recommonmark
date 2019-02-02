@@ -14,11 +14,11 @@ Contents
 
 ## Getting Started
 
-To use `recommonmark` inside of Sphinx only takes 2 steps. 
+To use `recommonmark` inside of Sphinx only takes 2 steps.
 First you install it:
 
 ```
-pip install recommonmark 
+pip install recommonmark
 ```
 
 Then add this to your Sphinx conf.py:
@@ -27,11 +27,22 @@ Then add this to your Sphinx conf.py:
 # for Sphinx-1.4 or newer
 extensions = ['recommonmark']
 
-# for Sphinx-1.3
+
+# for Sphinx-1.3 CommonMarkParser
 from recommonmark.parser import CommonMarkParser
 
 source_parsers = {
     '.md': CommonMarkParser,
+}
+
+source_suffix = ['.rst', '.md']
+
+
+# for Sphinx-1.3 MarkdownParser
+from recommonmark.parser import MarkdownParser
+
+source_parsers = {
+    '.md': MarkdownParser,
 }
 
 source_suffix = ['.rst', '.md']

@@ -9,13 +9,13 @@ from docutils.readers import Reader
 from docutils.core import publish_parts
 
 from commonmark import Parser
-from recommonmark.parser import CommonMarkParser
+from recommonmark.parser import MarkdownParser
 
 
 class TestParsing(unittest.TestCase):
 
     def assertParses(self, source, expected, alt=False):  # noqa
-        parser = CommonMarkParser()
+        parser = MarkdownParser()
         parser.parse(dedent(source), new_document('<string>'))
         self.assertMultiLineEqual(
             dedent(expected).lstrip(),
