@@ -197,28 +197,42 @@ class CommonMarkParser(parsers.Parser):
         self.current_node = self.current_node.parent
 
     def _visit_img(self, attrs):
-        pass
+        print(attrs)
+        image = nodes.image()
+        image['uri'] = _.find(attrs, lambda attr:attr[0]=='src')[1]
+        self.current_node.append(image)
+        self.current_node = image
+        self._visit_text(_.find(attrs, lambda attr:attr[0]=='alt')[1])
 
     def _depart_img(self):
-        pass
+        self._depart_text()
+        self.current_node = self.current_node.parent
 
     def _visit_ul(self, attrs):
-        pass
+        bullet_list = nodes.bullet_list()
+        self.current_node.append(bullet_list)
+        self.current_node = bullet_list
 
     def _depart_ul(self):
-        pass
+        self.current_node = self.current_node.parent
 
     def _visit_ol(self, attrs):
-        pass
+        enumerated_list = nodes.enumerated_list()
+        self.current_node.append(enumerated_list)
+        self.current_node = enumerated_list
 
     def _depart_ol(self):
-        pass
+        self.current_node = self.current_node.parent
 
     def _visit_li(self, attrs):
-        pass
+        list_item = nodes.list_item()
+        self.current_node.append(list_item)
+        self.current_node = list_item
+        self._visit_p([])
 
     def _depart_li(self):
-        pass
+        self._depart_p()
+        self.current_node = self.current_node.parent
 
     def _visit_table(self, attrs):
         pass

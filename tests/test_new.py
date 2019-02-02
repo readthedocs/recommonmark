@@ -34,6 +34,14 @@ class TestParsing(unittest.TestCase):
             [google](https://www.google.com)
 
             ## [B](#b)
+
+            ![ello](some-image.img)
+
+            * one
+            * two
+
+            1. ONE
+            2. TWO
             """,
             """
             <?xml version="1.0" ?>
@@ -53,6 +61,25 @@ class TestParsing(unittest.TestCase):
                   <title>
                     <reference refuri="#b">B</reference>
                   </title>
+                  <paragraph>
+                    <image uri="some-image.img">ello</image>
+                  </paragraph>
+                  <bullet_list>
+                    <list_item>
+                      <paragraph>one</paragraph>
+                    </list_item>
+                    <list_item>
+                      <paragraph>two</paragraph>
+                    </list_item>
+                  </bullet_list>
+                  <enumerated_list>
+                    <list_item>
+                      <paragraph>ONE</paragraph>
+                    </list_item>
+                    <list_item>
+                      <paragraph>TWO</paragraph>
+                    </list_item>
+                  </enumerated_list>
                 </section>
               </section>
             </document>
