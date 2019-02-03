@@ -3,6 +3,7 @@
 from docutils import parsers, nodes
 from html.parser import HTMLParser
 from markdown import markdown
+from pydash import _
 import re
 
 __all__ = ['MarkdownParser']
@@ -12,6 +13,7 @@ class MarkdownParser(parsers.Parser):
     """Docutils parser for Markdown"""
 
     depth = 0
+    html_mode = False
     level = 0
     supported = ('md', 'markdown')
     translate_section_name = None
@@ -49,7 +51,7 @@ class MarkdownParser(parsers.Parser):
                     fn = getattr(self, fn_name)
                     fn()
                 else:
-                    self.depart_html()
+                    self.depart_html(tag)
             def handle_data(_, data):
                 self.visit_text(data)
                 self.depart_text()
@@ -110,12 +112,17 @@ class MarkdownParser(parsers.Parser):
         if self.title_node:
             self.title_node.append(text)
             self.title_node = text
+        elif self.html_mode:
+            text = nodes.Text(self.current_node.children[0].astext() + data)
+            self.current_node.children[0] = text
         else:
             self.append_node(text)
 
     def depart_text(self):
         if self.title_node:
             self.title_node = self.title_node.parent
+        elif self.html_mode:
+            pass
         else:
             self.exit_node()
 
@@ -323,10 +330,32 @@ class MarkdownParser(parsers.Parser):
             self.exit_node()
 
     def visit_html(self, tag, attrs):
-        pass
+        if not self.html_mode:
+            raw = nodes.raw()
+            raw['format'] = 'html'
+            self.current_node.append(raw)
+            self.current_node = raw
+            self.html_mode = self.depth + 1
+        tag_html = '<' + tag + ''.join(
+            _.map(attrs, lambda value, attr: ' ' + attr + '="' + value + '"')
+        ) + '>'
+        if len(self.current_node.children):
+            text = nodes.Text(
+                self.current_node.children[0].astext() + tag_html
+            )
+            self.current_node.children[0] = text
+        else:
+            text = nodes.Text(tag_html)
+            self.current_node.append(text)
+        self.depth = self.depth + 1
 
-    def depart_html(self):
-        pass
+    def depart_html(self, tag):
+        text = nodes.Text(self.current_node.children[0].astext() + '</' + tag + '>')
+        self.current_node.children[0] = text
+        if self.depth == self.html_mode:
+            self.current_node = self.current_node.parent
+            self.html_mode = False
+        self.depth = self.depth - 1
 
     def append_node(self, node):
         self.current_node.append(node)

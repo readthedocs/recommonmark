@@ -22,6 +22,7 @@ class TestParsing(unittest.TestCase):
         )
 
     def test_heading(self):
+        self.maxDiff = None
         self.assertParses(
             """
             # I
@@ -56,7 +57,9 @@ class TestParsing(unittest.TestCase):
             | --- | --- |
             | ONE | TWO |
 
-            <video />
+            <video hello="world"><boo>howdy</boo></video>
+
+            wow
             """,
             """
             <?xml version="1.0" ?>
@@ -123,6 +126,8 @@ class TestParsing(unittest.TestCase):
                       </row>
                     </tbody>
                   </table>
+                  <raw format="html" xml:space="preserve">&lt;video hello=&quot;world&quot;&gt;&lt;boo&gt;howdy&lt;/boo&gt;&lt;/video&gt;</raw>
+                  <paragraph>wow</paragraph>
                 </section>
               </section>
             </document>

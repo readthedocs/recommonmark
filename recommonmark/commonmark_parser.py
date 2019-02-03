@@ -3,8 +3,6 @@
 import sys
 from os.path import splitext
 
-import pydash as _
-
 from docutils import parsers, nodes
 from sphinx import addnodes
 
