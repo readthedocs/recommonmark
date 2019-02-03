@@ -26,7 +26,6 @@ setup(
         'Markdown>=3.0.1',
         'commonmark>=0.7.3',
         'docutils>=0.11',
-        'pydash>=4.7.4',
         'sphinx>=1.3.1',
     ],
     entry_points={'console_scripts': [

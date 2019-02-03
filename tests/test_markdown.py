@@ -55,6 +55,8 @@ class TestParsing(unittest.TestCase):
             | one | two |
             | --- | --- |
             | ONE | TWO |
+
+            <video />
             """,
             """
             <?xml version="1.0" ?>

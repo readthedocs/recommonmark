@@ -3,7 +3,6 @@
 from docutils import parsers, nodes
 from html.parser import HTMLParser
 from markdown import markdown
-import pydash as _
 import re
 
 __all__ = ['MarkdownParser']
@@ -37,13 +36,20 @@ class MarkdownParser(parsers.Parser):
         html = html.replace('\n', '')
         class MyHTMLParser(HTMLParser):
             def handle_starttag(_, tag, attrs):
+                attrs = self.attrs_to_dict(attrs)
                 fn_name = 'visit_' + tag
-                fn = getattr(self, fn_name)
-                fn(attrs)
+                if hasattr(self, fn_name):
+                    fn = getattr(self, fn_name)
+                    fn(attrs)
+                else:
+                    self.visit_html(tag, attrs)
             def handle_endtag(_, tag):
                 fn_name = 'depart_' + tag
-                fn = getattr(self, fn_name)
-                fn()
+                if hasattr(self, fn_name):
+                    fn = getattr(self, fn_name)
+                    fn()
+                else:
+                    self.depart_html()
             def handle_data(_, data):
                 self.visit_text(data)
                 self.depart_text()
@@ -51,6 +57,13 @@ class MarkdownParser(parsers.Parser):
         parser = MyHTMLParser()
         parser.feed(html)
         self.depart_document()
+
+    def attrs_to_dict(self, attrs):
+        attrs_dict = {}
+        for item in attrs:
+            if len(item) == 2:
+                attrs_dict[item[0]] = item[1]
+        return attrs_dict
 
     def convert_ast(self, ast):
         for (node, entering) in ast.walker():
@@ -67,7 +80,7 @@ class MarkdownParser(parsers.Parser):
             self.depart_section(level)
         self.level = level
         section = nodes.section()
-        id_attr = _.find(attrs, lambda attr:attr[0]=='id')[1]
+        id_attr = attrs['id'] if 'id' in attrs else ''
         section['ids'] = id_attr
         section['names'] = id_attr
         title = nodes.title()
@@ -144,7 +157,7 @@ class MarkdownParser(parsers.Parser):
 
     def visit_a(self, attrs):
         reference = nodes.reference()
-        reference['refuri'] = _.find(attrs, lambda i: i[0] == 'href')[1]
+        reference['refuri'] = attrs['href'] if 'href' in attrs else ''
         if self.title_node:
             self.title_node.append(reference)
             self.title_node = reference
@@ -159,9 +172,9 @@ class MarkdownParser(parsers.Parser):
 
     def visit_img(self, attrs):
         image = nodes.image()
-        image['uri'] = _.find(attrs, lambda attr:attr[0]=='src')[1]
+        image['uri'] = attrs['src'] if 'src' in attrs else ''
         self.append_node(image)
-        self.visit_text(_.find(attrs, lambda attr:attr[0]=='alt')[1])
+        self.visit_text(attrs['alt'] if 'alt' in attrs else '')
 
     def depart_img(self):
         self.depart_text()
@@ -252,9 +265,8 @@ class MarkdownParser(parsers.Parser):
 
     def visit_code(self, attrs):
         literal_block = nodes.literal_block()
-        attr = _.find(attrs, lambda attr:attr[0]=='class')
-        if len(attr):
-            class_attr = attr[1]
+        class_attr = attrs['class'] if 'class' in attrs else ''
+        if len(class_attr):
             literal_block['language'] = class_attr
         self.append_node(literal_block)
 
@@ -309,6 +321,12 @@ class MarkdownParser(parsers.Parser):
             self.title_node = self.title_node.parent
         else:
             self.exit_node()
+
+    def visit_html(self, tag, attrs):
+        pass
+
+    def depart_html(self):
+        pass
 
     def append_node(self, node):
         self.current_node.append(node)
