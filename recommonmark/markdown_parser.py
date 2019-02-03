@@ -12,9 +12,10 @@ class MarkdownParser(parsers.Parser):
 
     """Docutils parser for Markdown"""
 
+    depth = 0
+    level = 0
     supported = ('md', 'markdown')
     translate_section_name = None
-    level = 0
 
     def __init__(self):
         self._level_to_elem = {}
@@ -72,12 +73,11 @@ class MarkdownParser(parsers.Parser):
         title = nodes.title()
         self.title_node = title
         section.append(title)
-        self.current_node.append(section)
-        self.current_node = section
+        self.append_node(section)
 
     def depart_section(self, level):
         if (self.current_node.parent):
-            self.current_node = self.current_node.parent
+            self.exit_node()
 
     def visit_document(self):
         pass
@@ -87,11 +87,10 @@ class MarkdownParser(parsers.Parser):
 
     def visit_p(self, attrs):
         paragraph = nodes.paragraph()
-        self.current_node.append(paragraph)
-        self.current_node = paragraph
+        self.append_node(paragraph)
 
     def depart_p(self):
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_text(self, data):
         text = nodes.Text(data)
@@ -99,14 +98,13 @@ class MarkdownParser(parsers.Parser):
             self.title_node.append(text)
             self.title_node = text
         else:
-            self.current_node.append(text)
-            self.current_node = text
+            self.append_node(text)
 
     def depart_text(self):
         if self.title_node:
             self.title_node = self.title_node.parent
         else:
-            self.current_node = self.current_node.parent
+            self.exit_node()
 
     def visit_h1(self, attrs):
         self.visit_section(1, attrs)
@@ -151,99 +149,88 @@ class MarkdownParser(parsers.Parser):
             self.title_node.append(reference)
             self.title_node = reference
         else:
-            self.current_node.append(reference)
-            self.current_node = reference
+            self.append_node(reference)
 
     def depart_a(self):
         if self.title_node:
             self.title_node = self.title_node.parent
         else:
-            self.current_node = self.current_node.parent
+            self.exit_node()
 
     def visit_img(self, attrs):
         image = nodes.image()
         image['uri'] = _.find(attrs, lambda attr:attr[0]=='src')[1]
-        self.current_node.append(image)
-        self.current_node = image
+        self.append_node(image)
         self.visit_text(_.find(attrs, lambda attr:attr[0]=='alt')[1])
 
     def depart_img(self):
         self.depart_text()
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_ul(self, attrs):
         bullet_list = nodes.bullet_list()
-        self.current_node.append(bullet_list)
-        self.current_node = bullet_list
+        self.append_node(bullet_list)
 
     def depart_ul(self):
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_ol(self, attrs):
         enumerated_list = nodes.enumerated_list()
-        self.current_node.append(enumerated_list)
-        self.current_node = enumerated_list
+        self.append_node(enumerated_list)
 
     def depart_ol(self):
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_li(self, attrs):
         list_item = nodes.list_item()
-        self.current_node.append(list_item)
-        self.current_node = list_item
+        self.append_node(list_item)
         self.visit_p([])
 
     def depart_li(self):
         self.depart_p()
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_table(self, attrs):
         table = nodes.table()
-        self.current_node.append(table)
-        self.current_node = table
+        self.append_node(table)
 
     def depart_table(self):
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_thead(self, attrs):
         thead = nodes.thead()
-        self.current_node.append(thead)
-        self.current_node = thead
+        self.append_node(thead)
 
     def depart_thead(self):
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_tbody(self, attrs):
         tbody = nodes.tbody()
-        self.current_node.append(tbody)
-        self.current_node = tbody
+        self.append_node(tbody)
 
     def depart_tbody(self):
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_tr(self, attrs):
         row = nodes.row()
-        self.current_node.append(row)
-        self.current_node = row
+        self.append_node(row)
 
     def depart_tr(self):
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_th(self, attrs):
         entry = nodes.entry()
-        self.current_node.append(entry)
-        self.current_node = entry
+        self.append_node(entry)
 
     def depart_th(self):
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_td(self, attrs):
         entry = nodes.entry()
-        self.current_node.append(entry)
-        self.current_node = entry
+        self.append_node(entry)
 
     def depart_td(self):
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_div(self, attrs):
         pass
@@ -269,35 +256,31 @@ class MarkdownParser(parsers.Parser):
         if len(attr):
             class_attr = attr[1]
             literal_block['language'] = class_attr
-        self.current_node.append(literal_block)
-        self.current_node = literal_block
+        self.append_node(literal_block)
 
     def depart_code(self):
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_blockquote(self, attrs):
         block_quote = nodes.block_quote()
-        self.current_node.append(block_quote)
-        self.current_node = block_quote
+        self.append_node(block_quote)
 
     def depart_blockquote(self):
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_hr(self, attrs):
         transition = nodes.transition()
-        self.current_node.append(transition)
-        self.current_node = transition
+        self.append_node(transition)
 
     def depart_hr(self):
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_br(self, attrs):
         text = nodes.Text('\n')
-        self.current_node.append(text)
-        self.current_node = text
+        self.append_node(text)
 
     def depart_br(self):
-        self.current_node = self.current_node.parent
+        self.exit_node()
 
     def visit_em(self, attrs):
         emphasis = nodes.emphasis()
@@ -305,14 +288,13 @@ class MarkdownParser(parsers.Parser):
             self.title_node.append(emphasis)
             self.title_node = emphasis
         else:
-            self.current_node.append(emphasis)
-            self.current_node = emphasis
+            self.append_node(emphasis)
 
     def depart_em(self):
         if self.title_node:
             self.title_node = self.title_node.parent
         else:
-            self.current_node = self.current_node.parent
+            self.exit_node()
 
     def visit_strong(self, attrs):
         strong = nodes.strong()
@@ -320,11 +302,19 @@ class MarkdownParser(parsers.Parser):
             self.title_node.append(strong)
             self.title_node = strong
         else:
-            self.current_node.append(strong)
-            self.current_node = strong
+            self.append_node(strong)
 
     def depart_strong(self):
         if self.title_node:
             self.title_node = self.title_node.parent
         else:
-            self.current_node = self.current_node.parent
+            self.exit_node()
+
+    def append_node(self, node):
+        self.current_node.append(node)
+        self.current_node = node
+        self.depth = self.depth + 1
+
+    def exit_node(self):
+        self.current_node = self.current_node.parent
+        self.depth = self.depth - 1
