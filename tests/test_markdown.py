@@ -51,6 +51,8 @@ class TestParsing(unittest.TestCase):
 
             **bold**
 
+            <strong attr="some-attr">special</strong>
+
             ---
 
             | one | two |
@@ -110,6 +112,9 @@ class TestParsing(unittest.TestCase):
                   </paragraph>
                   <paragraph>
                     <strong>bold</strong>
+                  </paragraph>
+                  <paragraph>
+                    <raw format="html" xml:space="preserve">&lt;strong attr=&quot;some-attr&quot;&gt;special&lt;/strong&gt;</raw>
                   </paragraph>
                   <transition/>
                   <table>

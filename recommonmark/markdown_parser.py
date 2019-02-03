@@ -101,14 +101,16 @@ class MarkdownParser(parsers.Parser):
         pass
 
     def visit_p(self, attrs):
-        if len(_.keys(attrs)):
+        if self.html_mode or len(_.keys(attrs)):
             self.visit_html('p', attrs)
         else:
             paragraph = nodes.paragraph()
             self.append_node(paragraph)
 
     def depart_p(self):
-        if not self.html_mode:
+        if self.html_mode:
+            self.depart_html('p', attrs)
+        else:
             self.exit_node()
 
     def visit_text(self, data):
@@ -131,67 +133,79 @@ class MarkdownParser(parsers.Parser):
             self.exit_node()
 
     def visit_h1(self, attrs):
-        if _.keys(attrs) != ['id']:
+        if self.html_mode or _.keys(attrs) != ['id']:
             self.visit_html('h1', attrs)
         else:
             self.visit_section(1, attrs)
 
     def depart_h1(self):
-        if not self.html_mode:
+        if self.html_mode:
+            self.depart_html('h1')
+        else:
             self.title_node = None
 
     def visit_h2(self, attrs):
-        if _.keys(attrs) != ['id']:
+        if self.html_mode or _.keys(attrs) != ['id']:
             self.visit_html('h2', attrs)
         else:
             self.visit_section(2, attrs)
 
     def depart_h2(self):
-        if not self.html_mode:
+        if self.html_mode:
+            self.depart_html('h2')
+        else:
             self.title_node = None
 
     def visit_h3(self, attrs):
-        if _.keys(attrs) != ['id']:
+        if self.html_mode or _.keys(attrs) != ['id']:
             self.visit_html('h3', attrs)
         else:
             self.visit_section(3, attrs)
 
     def depart_h3(self):
-        if not self.html_mode:
+        if self.html_mode:
+            self.depart_html('h3')
+        else:
             self.title_node = None
 
     def visit_h4(self, attrs):
-        if _.keys(attrs) != ['id']:
+        if self.html_mode or _.keys(attrs) != ['id']:
             self.visit_html('h4', attrs)
         else:
             self.visit_section(4, attrs)
 
     def depart_h4(self):
-        if not self.html_mode:
+        if self.html_mode:
+            self.depart_html('h4')
+        else:
             self.title_node = None
 
     def visit_h5(self, attrs):
-        if _.keys(attrs) != ['id']:
+        if self.html_mode or _.keys(attrs) != ['id']:
             self.visit_html('h5', attrs)
         else:
             self.visit_section(5, attrs)
 
     def depart_h5(self):
-        if not self.html_mode:
+        if self.html_mode:
+            self.depart_html('h5')
+        else:
             self.title_node = None
 
     def visit_h6(self, attrs):
-        if _.keys(attrs) != ['id']:
+        if self.html_mode or _.keys(attrs) != ['id']:
             self.visit_html('h6', attrs)
         else:
             self.visit_section(6, attrs)
 
     def depart_h6(self):
-        if not self.html_mode:
+        if self.html_mode:
+            self.depart_html('h6')
+        else:
             self.title_node = None
 
     def visit_a(self, attrs):
-        if _.keys(attrs) != ['href']:
+        if self.html_mode or _.keys(attrs) != ['href']:
             self.visit_html('a', attrs)
         else:
             reference = nodes.reference()
@@ -204,14 +218,14 @@ class MarkdownParser(parsers.Parser):
 
     def depart_a(self):
         if self.html_mode:
-            pass
+            self.depart_html('a')
         elif self.title_node:
             self.title_node = self.title_node.parent
         else:
             self.exit_node()
 
     def visit_img(self, attrs):
-        if _.keys(attrs) != ['alt', 'src']:
+        if self.html_mode or _.keys(attrs) != ['alt', 'src']:
             self.visit_html('img', attrs)
         else:
             image = nodes.image()
@@ -220,148 +234,228 @@ class MarkdownParser(parsers.Parser):
             self.visit_text(attrs['alt'] if 'alt' in attrs else '')
 
     def depart_img(self):
-        if not self.html_mode:
+        if self.html_mode:
+            self.depart_html('img')
+        else:
             self.depart_text()
             self.exit_node()
 
     def visit_ul(self, attrs):
-        bullet_list = nodes.bullet_list()
-        self.append_node(bullet_list)
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('ul', attrs)
+        else:
+            bullet_list = nodes.bullet_list()
+            self.append_node(bullet_list)
 
     def depart_ul(self):
-        self.exit_node()
+        if self.html_mode:
+            self.depart_html('ul')
+        else:
+            self.exit_node()
 
     def visit_ol(self, attrs):
-        enumerated_list = nodes.enumerated_list()
-        self.append_node(enumerated_list)
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('ol', attrs)
+        else:
+            enumerated_list = nodes.enumerated_list()
+            self.append_node(enumerated_list)
 
     def depart_ol(self):
-        self.exit_node()
+        if self.html_mode:
+            self.depart_html('ol')
+        else:
+            self.exit_node()
 
     def visit_li(self, attrs):
-        list_item = nodes.list_item()
-        self.append_node(list_item)
-        self.visit_p([])
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('li', attrs)
+        else:
+            list_item = nodes.list_item()
+            self.append_node(list_item)
+            self.visit_p([])
 
     def depart_li(self):
-        self.depart_p()
-        self.exit_node()
+        if self.html_mode:
+            self.depart_html('li')
+        else:
+            self.depart_p()
+            self.exit_node()
 
     def visit_table(self, attrs):
-        table = nodes.table()
-        self.append_node(table)
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('table', attrs)
+        else:
+            table = nodes.table()
+            self.append_node(table)
 
     def depart_table(self):
-        self.exit_node()
+        if self.html_mode:
+            self.depart_html('table')
+        else:
+            self.exit_node()
 
     def visit_thead(self, attrs):
-        thead = nodes.thead()
-        self.append_node(thead)
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('thead', attrs)
+        else:
+            thead = nodes.thead()
+            self.append_node(thead)
 
     def depart_thead(self):
-        self.exit_node()
+        if self.html_mode:
+            self.depart_html('thead')
+        else:
+            self.exit_node()
 
     def visit_tbody(self, attrs):
-        tbody = nodes.tbody()
-        self.append_node(tbody)
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('tbody', attrs)
+        else:
+            tbody = nodes.tbody()
+            self.append_node(tbody)
 
     def depart_tbody(self):
-        self.exit_node()
+        if self.html_mode:
+            self.html_mode('tbody')
+        else:
+            self.exit_node()
 
     def visit_tr(self, attrs):
-        row = nodes.row()
-        self.append_node(row)
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('tr', attrs)
+        else:
+            row = nodes.row()
+            self.append_node(row)
 
     def depart_tr(self):
-        self.exit_node()
+        if self.html_mode:
+            self.depart_html('tr')
+        else:
+            self.exit_node()
 
     def visit_th(self, attrs):
-        entry = nodes.entry()
-        self.append_node(entry)
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('th', attrs)
+        else:
+            entry = nodes.entry()
+            self.append_node(entry)
 
     def depart_th(self):
-        self.exit_node()
+        if self.html_mode:
+            self.depart_html('th')
+        else:
+            self.exit_node()
 
     def visit_td(self, attrs):
-        entry = nodes.entry()
-        self.append_node(entry)
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('td', attrs)
+        else:
+            entry = nodes.entry()
+            self.append_node(entry)
 
     def depart_td(self):
-        self.exit_node()
-
-    def visit_div(self, attrs):
-        pass
-
-    def depart_div(self):
-        pass
+        if self.html_mode:
+            self.depart_html('td')
+        else:
+            self.exit_node()
 
     def visit_pre(self, attrs):
-        pass
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('pre', attrs)
 
     def depart_pre(self):
-        pass
-
-    def visit_span(self, attrs):
-        pass
-
-    def depart_span(self):
-        pass
+        if self.html_mode:
+            self.depart_html('pre')
 
     def visit_code(self, attrs):
-        literal_block = nodes.literal_block()
-        class_attr = attrs['class'] if 'class' in attrs else ''
-        if len(class_attr):
-            literal_block['language'] = class_attr
-        self.append_node(literal_block)
+        if self.html_mode or _.keys(attrs) != ['class']:
+            self.visit_html('code', attrs)
+        else:
+            literal_block = nodes.literal_block()
+            class_attr = attrs['class'] if 'class' in attrs else ''
+            if len(class_attr):
+                literal_block['language'] = class_attr
+            self.append_node(literal_block)
 
     def depart_code(self):
-        self.exit_node()
+        if self.html_mode:
+            self.depart_html('code')
+        else:
+            self.exit_node()
 
     def visit_blockquote(self, attrs):
-        block_quote = nodes.block_quote()
-        self.append_node(block_quote)
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('blockquote', attrs)
+        else:
+            block_quote = nodes.block_quote()
+            self.append_node(block_quote)
 
     def depart_blockquote(self):
-        self.exit_node()
+        if self.html_mode:
+            self.depart_html('blockquote')
+        else:
+            self.exit_node()
 
     def visit_hr(self, attrs):
-        transition = nodes.transition()
-        self.append_node(transition)
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('hr', attrs)
+        else:
+            transition = nodes.transition()
+            self.append_node(transition)
 
     def depart_hr(self):
-        self.exit_node()
+        if self.html_mode:
+            self.depart_html('hr')
+        else:
+            self.exit_node()
 
     def visit_br(self, attrs):
-        text = nodes.Text('\n')
-        self.append_node(text)
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('br', attrs)
+        else:
+            text = nodes.Text('\n')
+            self.append_node(text)
 
     def depart_br(self):
-        self.exit_node()
+        if self.html_mode:
+            self.depart_html('br')
+        else:
+            self.exit_node()
 
     def visit_em(self, attrs):
-        emphasis = nodes.emphasis()
-        if self.title_node:
-            self.title_node.append(emphasis)
-            self.title_node = emphasis
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('em', attrs)
         else:
-            self.append_node(emphasis)
+            emphasis = nodes.emphasis()
+            if self.title_node:
+                self.title_node.append(emphasis)
+                self.title_node = emphasis
+            else:
+                self.append_node(emphasis)
 
     def depart_em(self):
-        if self.title_node:
+        if self.html_mode:
+            self.depart_html('em')
+        elif self.title_node:
             self.title_node = self.title_node.parent
         else:
             self.exit_node()
 
     def visit_strong(self, attrs):
-        strong = nodes.strong()
-        if self.title_node:
-            self.title_node.append(strong)
-            self.title_node = strong
+        if self.html_mode or len(_.keys(attrs)):
+            self.visit_html('strong', attrs)
         else:
-            self.append_node(strong)
+            strong = nodes.strong()
+            if self.title_node:
+                self.title_node.append(strong)
+                self.title_node = strong
+            else:
+                self.append_node(strong)
 
     def depart_strong(self):
-        if self.title_node:
+        if self.html_mode:
+            self.depart_html('strong')
+        elif self.title_node:
             self.title_node = self.title_node.parent
         else:
             self.exit_node()
