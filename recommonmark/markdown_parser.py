@@ -70,6 +70,7 @@ class MarkdownParser(parsers.Parser):
         section['ids'] = id_attr
         section['names'] = id_attr
         title = nodes.title()
+        self.title_node = title
         section.append(title)
         self.current_node.append(section)
         self.current_node = section
@@ -94,74 +95,70 @@ class MarkdownParser(parsers.Parser):
 
     def visit_text(self, data):
         text = nodes.Text(data)
-        if isinstance(self.current_node, nodes.section) and len(self.current_node.children) > 0:
-            title = self.current_node.children[0]
-            if isinstance(title, nodes.title):
-                title.append(text)
-                self.current_node = title
-                return None
-        elif isinstance(self.current_node, nodes.title) and len(self.current_node.children) > 0:
-            reference = self.current_node.children[0]
-            if isinstance(reference, nodes.reference):
-                reference.append(text)
-                self.current_node = reference
-                return None
-        self.current_node.append(text)
-        self.current_node = text
+        if self.title_node:
+            self.title_node.append(text)
+            self.title_node = text
+        else:
+            self.current_node.append(text)
+            self.current_node = text
 
     def depart_text(self):
-        self.current_node = self.current_node.parent
+        if self.title_node:
+            self.title_node = self.title_node.parent
+        else:
+            self.current_node = self.current_node.parent
 
     def visit_h1(self, attrs):
         self.visit_section(1, attrs)
 
     def depart_h1(self):
-        pass
+        self.title_node = None
 
     def visit_h2(self, attrs):
         self.visit_section(2, attrs)
 
     def depart_h2(self):
-        pass
+        self.title_node = None
 
     def visit_h3(self, attrs):
         self.visit_section(3, attrs)
 
     def depart_h3(self):
-        pass
+        self.title_node = None
 
     def visit_h4(self, attrs):
         self.visit_section(4, attrs)
 
     def depart_h4(self):
-        pass
+        self.title_node = None
 
     def visit_h5(self, attrs):
         self.visit_section(5, attrs)
 
     def depart_h5(self):
-        pass
+        self.title_node = None
 
     def visit_h6(self, attrs):
         self.visit_section(6, attrs)
 
     def depart_h6(self):
-        pass
+        self.title_node = None
 
     def visit_a(self, attrs):
         reference = nodes.reference()
         reference['refuri'] = _.find(attrs, lambda i: i[0] == 'href')[1]
-        if isinstance(self.current_node, nodes.section) and len(self.current_node.children) > 0:
-            title = self.current_node.children[0]
-            if isinstance(title, nodes.title):
-                title.append(reference)
-                self.current_node = title
-                return None
-        self.current_node.append(reference)
-        self.current_node = reference
+        if self.title_node:
+            self.title_node.append(reference)
+            self.title_node = reference
+        else:
+            self.current_node.append(reference)
+            self.current_node = reference
 
     def depart_a(self):
-        self.current_node = self.current_node.parent
+        if self.title_node:
+            self.title_node = self.title_node.parent
+        else:
+            self.current_node = self.current_node.parent
 
     def visit_img(self, attrs):
         image = nodes.image()
@@ -304,16 +301,30 @@ class MarkdownParser(parsers.Parser):
 
     def visit_em(self, attrs):
         emphasis = nodes.emphasis()
-        self.current_node.append(emphasis)
-        self.current_node = emphasis
+        if self.title_node:
+            self.title_node.append(emphasis)
+            self.title_node = emphasis
+        else:
+            self.current_node.append(emphasis)
+            self.current_node = emphasis
 
     def depart_em(self):
-        self.current_node = self.current_node.parent
+        if self.title_node:
+            self.title_node = self.title_node.parent
+        else:
+            self.current_node = self.current_node.parent
 
     def visit_strong(self, attrs):
         strong = nodes.strong()
-        self.current_node.append(strong)
-        self.current_node = strong
+        if self.title_node:
+            self.title_node.append(strong)
+            self.title_node = strong
+        else:
+            self.current_node.append(strong)
+            self.current_node = strong
 
     def depart_strong(self):
-        self.current_node = self.current_node.parent
+        if self.title_node:
+            self.title_node = self.title_node.parent
+        else:
+            self.current_node = self.current_node.parent

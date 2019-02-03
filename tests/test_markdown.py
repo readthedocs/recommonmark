@@ -9,7 +9,7 @@ from docutils.readers import Reader
 from docutils.core import publish_parts
 
 from commonmark import Parser
-from recommonmark.parser import MarkdownParser, CommonMarkParser
+from recommonmark.parser import MarkdownParser
 
 class TestParsing(unittest.TestCase):
 
@@ -30,7 +30,7 @@ class TestParsing(unittest.TestCase):
             hello = 'world'
             ```
 
-            ## A
+            ## _[**A**](https://google.com)_
 
             > some-blockquote
 
@@ -63,7 +63,13 @@ class TestParsing(unittest.TestCase):
                 <title>I</title>
                 <literal_block language="py" xml:space="preserve">hello = 'world'</literal_block>
                 <section ids="a" names="a">
-                  <title>A</title>
+                  <title>
+                    <emphasis>
+                      <reference refuri="https://google.com">
+                        <strong>A</strong>
+                      </reference>
+                    </emphasis>
+                  </title>
                   <block_quote>
                     <paragraph>some-blockquote</paragraph>
                   </block_quote>
