@@ -1,9 +1,10 @@
 """Docutils Markdown parser"""
 
-import pydash as _
 from docutils import parsers, nodes
-from markdown import markdown
 from html.parser import HTMLParser
+from markdown import markdown
+import pydash as _
+import re
 
 __all__ = ['MarkdownParser']
 
@@ -24,20 +25,9 @@ class MarkdownParser(parsers.Parser):
         self.setup_parse(inputstring, document)
         html = markdown(inputstring + '\n', extensions=[
             'extra',
-            'abbr',
-            'attr_list',
-            'def_list',
-            'fenced_code',
-            'footnotes',
             'tables',
-            'admonition',
-            'codehilite',
-            'meta',
-            'nl2br',
             'sane_lists',
-            'smarty',
             'toc',
-            'wikilinks'
         ])
         self.convert_html(html)
         self.finish_parse()
@@ -174,7 +164,6 @@ class MarkdownParser(parsers.Parser):
         self.current_node = self.current_node.parent
 
     def visit_img(self, attrs):
-        print(attrs)
         image = nodes.image()
         image['uri'] = _.find(attrs, lambda attr:attr[0]=='src')[1]
         self.current_node.append(image)
@@ -277,6 +266,18 @@ class MarkdownParser(parsers.Parser):
     def depart_span(self):
         pass
 
+    def visit_code(self, attrs):
+        literal_block = nodes.literal_block()
+        attr = _.find(attrs, lambda attr:attr[0]=='class')
+        if len(attr):
+            class_attr = attr[1]
+            literal_block['language'] = class_attr
+        self.current_node.append(literal_block)
+        self.current_node = literal_block
+
+    def depart_code(self):
+        self.current_node = self.current_node.parent
+
     def visit_blockquote(self, attrs):
         block_quote = nodes.block_quote()
         self.current_node.append(block_quote)
@@ -299,4 +300,20 @@ class MarkdownParser(parsers.Parser):
         self.current_node = text
 
     def depart_br(self):
+        self.current_node = self.current_node.parent
+
+    def visit_em(self, attrs):
+        emphasis = nodes.emphasis()
+        self.current_node.append(emphasis)
+        self.current_node = emphasis
+
+    def depart_em(self):
+        self.current_node = self.current_node.parent
+
+    def visit_strong(self, attrs):
+        strong = nodes.strong()
+        self.current_node.append(strong)
+        self.current_node = strong
+
+    def depart_strong(self):
         self.current_node = self.current_node.parent

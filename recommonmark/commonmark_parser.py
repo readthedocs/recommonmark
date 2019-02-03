@@ -40,6 +40,7 @@ class CommonMarkParser(parsers.Parser):
         ast = parser.parse(inputstring + '\n')
         self.convert_ast(ast)
         self.finish_parse()
+        print(self.document)
 
     def convert_ast(self, ast):
         for (node, entering) in ast.walker():

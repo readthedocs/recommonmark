@@ -9,8 +9,7 @@ from docutils.readers import Reader
 from docutils.core import publish_parts
 
 from commonmark import Parser
-from recommonmark.parser import MarkdownParser
-
+from recommonmark.parser import MarkdownParser, CommonMarkParser
 
 class TestParsing(unittest.TestCase):
 
@@ -26,6 +25,10 @@ class TestParsing(unittest.TestCase):
         self.assertParses(
             """
             # I
+
+            ```py
+            hello = 'world'
+            ```
 
             ## A
 
@@ -43,6 +46,10 @@ class TestParsing(unittest.TestCase):
             1. ONE
             2. TWO
 
+            _italicize_
+
+            **bold**
+
             ---
 
             | one | two |
@@ -54,6 +61,7 @@ class TestParsing(unittest.TestCase):
             <document source="&lt;string&gt;">
               <section ids="i" names="i">
                 <title>I</title>
+                <literal_block language="py" xml:space="preserve">hello = 'world'</literal_block>
                 <section ids="a" names="a">
                   <title>A</title>
                   <block_quote>
@@ -86,6 +94,12 @@ class TestParsing(unittest.TestCase):
                       <paragraph>TWO</paragraph>
                     </list_item>
                   </enumerated_list>
+                  <paragraph>
+                    <emphasis>italicize</emphasis>
+                  </paragraph>
+                  <paragraph>
+                    <strong>bold</strong>
+                  </paragraph>
                   <transition/>
                   <table>
                     <thead>
