@@ -25,6 +25,10 @@ class TestParsing(unittest.TestCase):
         self.maxDiff = None
         self.assertParses(
             """
+            ----
+            hello: world
+            ----
+
             # I
 
             ```py

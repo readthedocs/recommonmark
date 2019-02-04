@@ -5,6 +5,7 @@ from html.parser import HTMLParser
 from markdown import markdown
 from pydash import _
 import re
+import yaml
 
 __all__ = ['MarkdownParser']
 
@@ -25,7 +26,9 @@ class MarkdownParser(parsers.Parser):
         self.document = document
         self.current_node = document
         self.setup_parse(inputstring, document)
-        html = markdown(inputstring + '\n', extensions=[
+        frontmatter = self.get_frontmatter(inputstring)
+        md = self.get_md(inputstring)
+        html = markdown(md + '\n', extensions=[
             'extra',
             'tables',
             'sane_lists',
@@ -59,6 +62,26 @@ class MarkdownParser(parsers.Parser):
         parser = MyHTMLParser()
         parser.feed(html)
         self.depart_document()
+
+    def get_frontmatter(self, string):
+        frontmatter = {}
+        frontmatter_string = ''
+        frontmatter_regex = re.findall(
+            r'^\s*---+((\s|\S)+?)---+',
+            string
+        )
+        if len(frontmatter_regex) and len(frontmatter_regex[0]):
+            frontmatter_string = frontmatter_regex[0][0]
+        if len(frontmatter_string):
+            frontmatter = yaml.load(frontmatter_string)
+        return frontmatter
+
+    def get_md(self, string):
+        return re.sub(
+            r'^\s*---+(\s|\S)+?---+\n((\s|\S)*)',
+            r'\2',
+            string
+        )
 
     def attrs_to_dict(self, attrs):
         attrs_dict = {}

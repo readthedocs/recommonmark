@@ -24,6 +24,7 @@ setup(
     ],
     install_requires=[
         'Markdown>=3.0.1',
+        'PyYAML==3.13',
         'commonmark>=0.7.3',
         'docutils>=0.11',
         'pydash==4.7.4',
