@@ -42,4 +42,4 @@ unlink: install
 
 .PHONY: clean
 clean:
-	@git clean -fXd -e !env
+	@git clean -fXd -e !env -e !env/**/*
