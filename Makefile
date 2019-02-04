@@ -32,6 +32,11 @@ publish: dist
 	@twine upload dist/*
 	@echo published
 
+.PHONY: test
+test: install
+test:
+	@env/bin/python3 -m unittest discover tests
+
 .PHONY: link
 link: install
 	@pip3 install -e .
