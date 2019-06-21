@@ -41,6 +41,7 @@ class AutoStructify(transforms.Transform):
 
     default_config = {
         'enable_auto_doc_ref': False,
+        'auto_toc_maxdepth': 1,
         'auto_toc_tree_section': None,
         'enable_auto_toc_tree': True,
         'enable_eval_rst': True,
@@ -179,7 +180,10 @@ class AutoStructify(transforms.Transform):
                                  self.current_level)
         return self.state_machine.run_directive(
             'toctree',
-            options={'maxdepth': 1, 'numbered': numbered},
+            options={
+                'maxdepth': self.config['auto_toc_maxdepth'],
+                'numbered': numbered,
+            },
             content=['%s <%s>' % (k, v) for k, v in refs])
 
     def auto_inline_code(self, node):
