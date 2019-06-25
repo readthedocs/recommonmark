@@ -163,9 +163,7 @@ class AutoStructify(transforms.Transform):
             if len(par.children) != 1:
                 return None
             ref = par.children[0]
-            if isinstance(ref, addnodes.pending_xref):
-                ref = ref.children[0]
-            if not isinstance(ref, nodes.reference):
+            if not isinstance(ref, (addnodes.pending_xref, nodes.reference)):
                 return None
             title, uri, docpath = self.parse_ref(ref)
             if title is None or uri.startswith('#'):

@@ -114,8 +114,14 @@ class GenericTests(SphinxIntegrationTests):
         )
         self.assertIn(
             ('This is a '
-             '<a class="reference external" '
-             'href="/example">relative link</a>'),
+             '<a class="reference internal" '
+             'href="#"><span class="doc">relative link</span></a>'),
+            output
+        )
+        self.assertIn(
+            ('This is another '
+             '<a class="reference internal" '
+             'href="foo.html"><span class="doc">relative link</span></a>'),
             output
         )
         self.assertIn(
