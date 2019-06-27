@@ -131,6 +131,13 @@ class CommonMarkParser(parsers.Parser):
 
     def visit_link(self, mdnode):
         destination = mdnode.destination
+        if not destination:
+            # If the destination of the link is empty, use the value of the string
+            # contained in the text to be rendered, if there is any.
+            for walker_node, _entering in mdnode.walker():
+                if walker_node.literal:
+                    destination = walker_node.literal
+                    break
         _, ext = splitext(destination)
         # Check destination is supported for cross-linking and remove extension
         # TODO check for other supported extensions, such as those specified in
