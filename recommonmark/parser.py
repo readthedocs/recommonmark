@@ -11,9 +11,9 @@ from commonmark import Parser
 from warnings import warn
 
 if sys.version_info < (3, 0):
-    from urlparse import urlparse
+    from urlparse import urlparse, unquote
 else:
-    from urllib.parse import urlparse
+    from urllib.parse import urlparse, unquote
 
 __all__ = ['CommonMarkParser']
 
@@ -152,7 +152,7 @@ class CommonMarkParser(parsers.Parser):
         url_check = urlparse(destination)
         if not url_check.scheme and not url_check.fragment:
             wrap_node = addnodes.pending_xref(
-                reftarget=destination,
+                reftarget=unquote(destination),
                 reftype='any',
                 refdomain=None,  # Added to enable cross-linking
                 refexplicit=True,
@@ -178,8 +178,15 @@ class CommonMarkParser(parsers.Parser):
         img_node = nodes.image()
         img_node['uri'] = mdnode.destination
 
-        if mdnode.title:
-            img_node['alt'] = mdnode.title
+        if mdnode.first_child and mdnode.first_child.literal:
+            content = [mdnode.first_child.literal]
+            n = mdnode.first_child
+            mdnode.first_child.literal = ''
+            mdnode.first_child = mdnode.last_child = None
+            while getattr(n, 'nxt'):
+                n.nxt, n = None, n.nxt
+                content.append(n.literal)
+            img_node['alt'] = ''.join(content)
 
         self.current_node.append(img_node)
         self.current_node = img_node
