@@ -109,6 +109,9 @@ class CommonMarkParser(parsers.Parser):
     def visit_softbreak(self, _):
         self.current_node.append(nodes.Text('\n'))
 
+    def visit_linebreak(self, _):
+        self.current_node.append(nodes.raw('', '<br />', format='html'))
+
     def visit_paragraph(self, mdnode):
         p = nodes.paragraph(mdnode.literal)
         p.line = mdnode.sourcepos[0][0]
