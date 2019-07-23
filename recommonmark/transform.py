@@ -48,6 +48,7 @@ class AutoStructify(transforms.Transform):
         'enable_inline_math': True,
         'commonmark_suffixes': ['.md'],
         'url_resolver': lambda x: x,
+        'known_url_schemes': None,
     }
 
     def parse_ref(self, ref):
