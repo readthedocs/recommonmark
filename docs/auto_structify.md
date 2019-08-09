@@ -1,5 +1,6 @@
 AutoStructify Component
 =======================
+
 AutoStructify is a component in recommonmark that takes a parsed docutil AST by `CommonMarkParser`,
 and transform it to another AST that introduces some of more. This enables additional features
 of recommonmark syntax, to introduce more structure into the final generated document.
@@ -7,6 +8,7 @@ of recommonmark syntax, to introduce more structure into the final generated doc
 
 Configuring AutoStructify
 -------------------------
+
 The behavior of AutoStructify can be configured via a dict in document setting.
 In sphinx, you can configure it by `conf.py`. The following snippet
 is what is actually used to generate this document, see full code at [conf.py](conf.py).
@@ -21,9 +23,11 @@ def setup(app):
     app.add_transform(AutoStructify)
 
 ```
+
 All the features are by default enabled
 
 ***List of options***
+
 * __enable_auto_toc_tree__: whether enable [Auto Toc Tree](#auto-toc-tree) feature.
 * __auto_toc_tree_section__: when enabled,  [Auto Toc Tree](#auto-toc-tree) will only be enabled on section that matches the title.
 * __enable_auto_doc_ref__: whether enable [Auto Doc Ref](#auto-doc-ref) feature.  **Deprecated**
@@ -34,6 +38,7 @@ All the features are by default enabled
 
 Auto Toc Tree
 -------------
+
 One of important command in tools like sphinx is `toctree`. This is a command to generate table of contents and
 tell sphinx about the structure of the documents. In markdown, usually we manually list of contents by a bullet list
 of url reference to the other documents.
@@ -44,7 +49,9 @@ AutoStructify transforms bullet list of document URLs like this
 * [Title1](doc1.md)
 * [Title2](doc2.md)
 ```
+
 to the AST of this following reStructuredText code
+
 ```rst
 .. toctree::
    :maxdepth: 1
@@ -52,6 +59,7 @@ to the AST of this following reStructuredText code
    doc1
    doc2
 ```
+
 You can also find the usage of this feature in `index.md` of this document.
 
 Auto Doc Ref
@@ -66,10 +74,13 @@ Auto Doc Ref
 
 It is common to refer to another document page in one document. We usually use reference to do that.
 AutoStructify will translate these reference block into a structured document reference. For example
+
 ```
 [API Reference](api_ref.md)
 ```
+
 will be translated to the AST of following reStructuredText code
+
 ```
 :doc:`API Reference </api_ref>`
 ```
@@ -77,6 +88,7 @@ And it will be rendered as [API Reference](api_ref)
 
 URL Resolver
 ------------
+
 Sometimes in a markdown, we want to refer to the code in the same repo.
 This can usually be done by a reference by reference path. However, since the generated document is hosted elsewhere,
 the relative path may not work in generated document site. URL resolver is introduced to solve this problem.
@@ -87,9 +99,9 @@ So `[parser code](../recommonmark/parser.py)` will be translated into [parser co
 
 Note that the reference to the internal document will not be passed to url resolver, and will be linked to the internal document pages correctly, see [Auto Doc Ref](#auto-doc-ref).
 
-
 Codeblock Extensions
 --------------------
+
 In markdown, you can write codeblocks fenced by (at least) three backticks
 (```` ``` ````).  The following is an example of codeblock.
 
