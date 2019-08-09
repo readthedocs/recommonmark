@@ -134,7 +134,7 @@ def function():
 ### Math Formula
 You can normally write latex math formula with `math` codeblock. See also [Inline Math](#inline-math).
 
-**Warning**: Math is currently broken on some Sphinx builds
+**Warning**: Math is currently broken on some Sphinx builds.
 
 Example
 
@@ -252,7 +252,7 @@ in the beginning and end of inline codeblock.
 
 Example
 
-**Warning**: Math is currently broken on some Sphinx builds
+**Warning**: Math is currently broken on some Sphinx builds.
 
 ```
 This formula `$ y=\sum_{i=1}^n g(x_i) $`
