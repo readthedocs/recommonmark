@@ -25,12 +25,22 @@ class CommonMarkParser(parsers.Parser):
     supported = ('md', 'markdown')
     translate_section_name = None
 
+    default_config = {
+        'known_url_schemes': None,
+    }
+
     def __init__(self):
         self._level_to_elem = {}
 
     def parse(self, inputstring, document):
         self.document = document
         self.current_node = document
+        self.config = self.default_config.copy()
+        try:
+            new_cfg = self.document.settings.env.config.recommonmark_config
+            self.config.update(new_cfg)
+        except AttributeError:
+            pass
         self.setup_parse(inputstring, document)
         self.setup_sections()
         parser = Parser()
@@ -153,7 +163,16 @@ class CommonMarkParser(parsers.Parser):
         next_node = ref_node
 
         url_check = urlparse(destination)
-        if not url_check.scheme and not url_check.fragment:
+        # If there's not a url scheme (e.g. 'https' for 'https:...' links),
+        # or there is a scheme but it's not in the list of known_url_schemes,
+        # then assume it's a cross-reference and pass it to Sphinx as an `:any:` ref.
+        known_url_schemes = self.config.get('known_url_schemes')
+        if known_url_schemes:
+            scheme_known = url_check.scheme in known_url_schemes
+        else:
+            scheme_known = bool(url_check.scheme)
+
+        if not url_check.fragment and not scheme_known:
             wrap_node = addnodes.pending_xref(
                 reftarget=unquote(destination),
                 reftype='any',
