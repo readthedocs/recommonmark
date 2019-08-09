@@ -105,6 +105,7 @@ See https://github.com/rtfd/recommonmark/blob/master/docs/conf.py for a full exa
 AutoStructify comes with the following options. See [http://recommonmark.readthedocs.org/en/latest/auto_structify.html](http://recommonmark.readthedocs.org/en/latest/auto_structify.html) for more information about the specific features.
 
 * __enable_auto_toc_tree__: enable the Auto Toc Tree feature.
+* __auto_toc_maxdepth__: The max depth of the Auto Toc. Defaults to 1.
 * __auto_toc_tree_section__: when True, Auto Toc Tree will only be enabled on section that matches the title.
 * __enable_auto_doc_ref__: enable the Auto Doc Ref feature. **Deprecated**
 * __enable_math__: enable the Math Formula feature.
