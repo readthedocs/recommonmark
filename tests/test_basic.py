@@ -17,6 +17,7 @@ class TestParsing(unittest.TestCase):
     def assertParses(self, source, expected, alt=False):  # noqa
         parser = CommonMarkParser()
         parser.parse(dedent(source), new_document('<string>'))
+        self.maxDiff = None
         self.assertMultiLineEqual(
             dedent(expected).lstrip(),
             dedent(parser.document.asdom().toprettyxml(indent='  ')),
@@ -222,6 +223,46 @@ class TestParsing(unittest.TestCase):
             </document>
             """
         )
+
+    def test_known_schemes(self):
+        self.assertParses(
+            """
+            [https link](https://example.com)
+            [http link](http://example.com)
+            [mailto link](mailto:admin@example.com)
+            [custom scheme](custom:example.com)
+            [ref link](path/to/file:heading)
+            [ref link with spaces](<path/to/file:heading with spaces>)
+            """,
+            """
+            <?xml version="1.0" ?>
+            <document source="&lt;string&gt;">
+              <paragraph>
+                <reference refuri="https://example.com">https link</reference>
+
+
+                <reference refuri="http://example.com">http link</reference>
+
+
+                <reference refuri="mailto:admin@example.com">mailto link</reference>
+
+
+                <reference refuri="custom:example.com">custom scheme</reference>
+
+
+                <pending_xref refdomain="None" refexplicit="True" reftarget="path/to/file:heading" reftype="any" refwarn="True">
+                  <reference refuri="path/to/file:heading">ref link</reference>
+                </pending_xref>
+
+
+                <pending_xref refdomain="None" refexplicit="True" reftarget="path/to/file:heading with spaces" reftype="any" refwarn="True">
+                  <reference refuri="path/to/file:heading%20with%20spaces">ref link with spaces</reference>
+                </pending_xref>
+              </paragraph>
+            </document>
+            """
+        )
+        pass
 
     def test_image(self):
         self.assertParses(
