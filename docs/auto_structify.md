@@ -134,6 +134,8 @@ def function():
 ### Math Formula
 You can normally write latex math formula with `math` codeblock. See also [Inline Math](#inline-math).
 
+**Warning**: Math is currently broken on some Sphinx builds.
+
 Example
 
 ````
@@ -149,6 +151,7 @@ E = m c^2
 ```
 
 ### Embed reStructuredText
+
 Recommonmark also allows embedding reStructuredText syntax in the codeblocks.
 There are two styles for embedding reStructuredText. The first is enabled by `eval_rst` codeblock. The content of codeblock will be parsed as reStructuredText and insert into the document. This can be used to quickly introduce some of reStructuredText command that not yet available in markdown. For example,
 
@@ -243,10 +246,13 @@ The `<div style="clear: right;"></div>` line clears the sidebar for the next tit
 
 Inline Math
 -----------
+
 Besides the [Math Formula](#math-formula), you can also write latex math in inline codeblock text. You can do so by inserting `$`
 in the beginning and end of inline codeblock.
 
 Example
+
+**Warning**: Math is currently broken on some Sphinx builds.
 
 ```
 This formula `$ y=\sum_{i=1}^n g(x_i) $`
