@@ -459,6 +459,24 @@ class TestParsing(unittest.TestCase):
             """
         )
 
+    def test_linebreak(self):
+        self.assertParses(
+            """
+            line1  
+            line2
+            """,
+            """
+            <?xml version="1.0" ?>
+            <document source="&lt;string&gt;">
+              <paragraph>
+                line1
+                <raw format="html" xml:space="preserve">&lt;br /&gt;</raw>
+                line2
+              </paragraph>
+            </document>
+            """
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
