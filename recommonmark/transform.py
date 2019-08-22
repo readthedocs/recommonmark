@@ -50,6 +50,7 @@ class AutoStructify(transforms.Transform):
         'commonmark_suffixes': ['.md'],
         'url_resolver': lambda x: x,
         'known_url_schemes': None,
+        'enable_label': True,
     }
 
     def parse_ref(self, ref):
@@ -242,6 +243,14 @@ class AutoStructify(transforms.Transform):
             if self.config['enable_math']:
                 return self.state_machine.run_directive(
                     'math', content=content)
+        elif language == 'label':
+            if self.config['enable_label']:
+                node = nodes.section()
+                self.state_machine.state.nested_parse(
+                    StringList(['.. _' + content[0] + ':', ''],
+                               source=''),
+                    0, node=node, match_titles=True)
+                return node.children[:]
         elif language == 'eval_rst':
             if self.config['enable_eval_rst']:
                 # allow embed non section level rst

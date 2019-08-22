@@ -34,6 +34,7 @@ All the features are by default enabled
 * __enable_math__: whether enable [Math Formula](#math-formula)
 * __enable_inline_math__: whether enable [Inline Math](#inline-math)
 * __enable_eval_rst__: whether [Embed reStructuredText](#embed-restructuredtext) is enabled.
+* __enable_label_rst__: whether [Cross-reference Labels](#embed-reference-label) is enabled.
 * __url_resolver__: a function that maps a existing relative position in the document to a http link
 
 Auto Toc Tree
@@ -148,6 +149,21 @@ will be rendered as
 
 ```math
 E = m c^2
+```
+
+### Embed Reference Labels
+You can embed reference labels via a `label` code block. The first line of that block is parsed as that label.
+
+Example
+````
+```label
+a-label
+```
+````
+
+Is equivalent to
+```rst
+.. _a-label:
 ```
 
 ### Embed reStructuredText

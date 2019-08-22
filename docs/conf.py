@@ -299,5 +299,6 @@ def setup(app):
         'enable_inline_math': False,
         'enable_eval_rst': True,
         'enable_auto_doc_ref': True,
+        'enable_label': True
     }, True)
     app.add_transform(AutoStructify)

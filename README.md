@@ -111,6 +111,7 @@ AutoStructify comes with the following options. See [http://recommonmark.readthe
 * __enable_math__: enable the Math Formula feature.
 * __enable_inline_math__: enable the Inline Math feature.
 * __enable_eval_rst__: enable the evaluate embedded reStructuredText feature.
+* __enable_label__: enable the cross-referencing label feature.
 * __url_resolver__: a function that maps a existing relative position in the document to a http link
 * __known_url_schemes__: a list of url schemes to treat as URLs, schemes not in this list will be assumed to be Sphinx cross-references.
     Defaults to `None`, which means treat all URL schemes as URLs.
