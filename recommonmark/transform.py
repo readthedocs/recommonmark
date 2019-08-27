@@ -210,7 +210,7 @@ class AutoStructify(transforms.Transform):
         if content.startswith('$') and content.endswith('$'):
             if not self.config['enable_inline_math']:
                 return None
-            content = content[1:-1]
+            content = '`' + content[1:-1] + '`'
             self.state_machine.reset(self.document,
                                      node.parent,
                                      self.current_level)
