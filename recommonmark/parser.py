@@ -58,6 +58,10 @@ class CommonMarkParser(parsers.Parser):
                 fn = getattr(self, fn_default)
             fn(node)
 
+    def visit_document(self, mdnode):
+        # Avoid "Container node skipped: type=document" warning in default_depart.
+        pass
+
     # Node type enter/exit handlers
     def default_visit(self, mdnode):
         pass
