@@ -85,7 +85,7 @@ class CommonMarkParser(parsers.Parser):
         title_node = nodes.title()
         title_node.line = mdnode.sourcepos[0][0]
 
-        new_section = nodes.section()
+        new_section = nodes.section(level=mdnode.level)
         new_section.line = mdnode.sourcepos[0][0]
         new_section.append(title_node)
 
