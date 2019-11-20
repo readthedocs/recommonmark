@@ -82,10 +82,10 @@ class CommonMarkParser(parsers.Parser):
             if self.is_section_level(mdnode.level, self.current_node):
                 self.current_node = self.current_node.parent
 
-        title_node = nodes.title()
+        title_node = nodes.title(mdnode.string_content)
         title_node.line = mdnode.sourcepos[0][0]
 
-        new_section = nodes.section()
+        new_section = nodes.section(mdnode.string_content)
         new_section.line = mdnode.sourcepos[0][0]
         new_section.append(title_node)
 
@@ -123,7 +123,7 @@ class CommonMarkParser(parsers.Parser):
         self.current_node.append(nodes.raw('', '<br />', format='html'))
 
     def visit_paragraph(self, mdnode):
-        p = nodes.paragraph(mdnode.literal)
+        p = nodes.paragraph(mdnode.string_content)
         p.line = mdnode.sourcepos[0][0]
         self.current_node.append(p)
         self.current_node = p
@@ -219,14 +219,14 @@ class CommonMarkParser(parsers.Parser):
             list_node_cls = nodes.bullet_list
         else:
             list_node_cls = nodes.enumerated_list
-        list_node = list_node_cls()
+        list_node = list_node_cls(mdnode.string_content)
         list_node.line = mdnode.sourcepos[0][0]
 
         self.current_node.append(list_node)
         self.current_node = list_node
 
     def visit_item(self, mdnode):
-        node = nodes.list_item()
+        node = nodes.list_item(mdnode.string_content)
         node.line = mdnode.sourcepos[0][0]
         self.current_node.append(node)
         self.current_node = node
@@ -242,13 +242,13 @@ class CommonMarkParser(parsers.Parser):
         self.current_node.append(node)
 
     def visit_block_quote(self, mdnode):
-        q = nodes.block_quote()
+        q = nodes.block_quote(mdnode.string_content)
         q.line = mdnode.sourcepos[0][0]
         self.current_node.append(q)
         self.current_node = q
 
     def visit_html(self, mdnode):
-        raw_node = nodes.raw(mdnode.literal,
+        raw_node = nodes.raw(mdnode.string_content,
                              mdnode.literal, format='html')
         if mdnode.sourcepos is not None:
             raw_node.line = mdnode.sourcepos[0][0]
