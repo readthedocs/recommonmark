@@ -35,9 +35,9 @@ class TestParsing(unittest.TestCase):
             """
             <?xml version="1.0" ?>
             <document source="&lt;string&gt;">
-              <section ids="heading-1" names="heading\ 1">
+              <section ids="heading-1" level="1" names="heading\ 1">
                 <title>Heading 1</title>
-                <section ids="heading-2" names="heading\ 2">
+                <section ids="heading-2" level="2" names="heading\ 2">
                   <title>Heading 2</title>
                   <paragraph>Body</paragraph>
                 </section>
@@ -52,7 +52,7 @@ class TestParsing(unittest.TestCase):
             """
             <?xml version="1.0" ?>
             <document source="&lt;string&gt;">
-              <section ids="heading-foo" names="heading\ foo">
+              <section ids="heading-foo" level="1" names="heading\ foo">
                 <title>
                   Heading \n\
                   <emphasis>foo</emphasis>
