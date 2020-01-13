@@ -8,6 +8,7 @@ from docutils.statemachine import StringList
 from docutils.parsers.rst import Parser
 from docutils.utils import new_document
 from sphinx import addnodes
+from sphinx.transforms.i18n import Locale
 
 from .states import DummyStateMachine
 
@@ -35,8 +36,9 @@ class AutoStructify(transforms.Transform):
             self.reporter.warning(
                 'AutoStructify option "enable_auto_doc_ref" is deprecated')
 
-    # set to a high priority so it can be applied first for markdown docs
-    default_priority = 1
+    # This must run after Sphinx's Locale transform. Otherwise, translations of strings in reStructured Text will be
+    # parsed as Markdown.
+    default_priority = Locale.default_priority + 1
     suffix_set = set(['md', 'rst'])
 
     default_config = {
