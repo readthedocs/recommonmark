@@ -187,7 +187,7 @@ class MathBlockTests(unittest.TestCase):
 
     def test_integration(self):
         with sphinx_built_file('sphinx_inline_math', '_build/text/index.html') as output:
-            self.assertIn('MathJax.Hub.Config', output)
+            self.assertIn('MathJax', output)
 
 
 class IndentedCodeTests(unittest.TestCase):

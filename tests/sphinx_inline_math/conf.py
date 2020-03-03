@@ -4,11 +4,15 @@
 from recommonmark.parser import CommonMarkParser
 
 templates_path = ['_templates']
-extensions = [
-    'sphinx.ext.mathjax'
-]
-source_suffix = '.md'
 source_parsers = { '.md': CommonMarkParser }
+
+extensions = [
+    'sphinx.ext.mathjax',
+]
+mathjax_config = {
+    'extensions': ['tex2jax.js'],
+    'jax': ['input/TeX', 'output/HTML-CSS'],
+}
 master_doc = 'index'
 project = u'sphinxproj'
 copyright = u'2015, rtfd'
@@ -23,3 +27,5 @@ todo_include_todos = False
 html_theme = 'alabaster'
 html_static_path = ['_static']
 htmlhelp_basename = 'sphinxproj'
+
+
