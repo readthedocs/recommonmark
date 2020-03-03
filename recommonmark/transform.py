@@ -7,9 +7,12 @@ from docutils import nodes, transforms
 from docutils.statemachine import StringList
 from docutils.parsers.rst import Parser
 from docutils.utils import new_document
-from sphinx import addnodes
+from sphinx import addnodes, __version__ as sphinx_version
 
 from .states import DummyStateMachine
+
+
+sphinx_version = [ int(semver_num) for semver_num in sphinx_version.split(".") ]
 
 
 class AutoStructify(transforms.Transform):
@@ -213,6 +216,10 @@ class AutoStructify(transforms.Transform):
             self.state_machine.reset(self.document,
                                      node.parent,
                                      self.current_level)
+            # In sphinx 1.8+, the parser has migrated to docutils math role, which
+            # expects containing "`" in the rst file.
+            if sphinx_version[0] >= 2 or sphinx_version[1] >= 7:
+                content = "`%s`" % content
             return self.state_machine.run_role('math', content=content)
         else:
             return None
