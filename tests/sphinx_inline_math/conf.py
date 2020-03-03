@@ -4,6 +4,9 @@
 from recommonmark.parser import CommonMarkParser
 
 templates_path = ['_templates']
+extensions = [
+    'sphinx.ext.mathjax'
+]
 source_suffix = '.md'
 source_parsers = { '.md': CommonMarkParser }
 master_doc = 'index'
