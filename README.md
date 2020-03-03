@@ -1,4 +1,4 @@
-x# recommonmark
+# recommonmark
 
 A `docutils`-compatibility bridge to [CommonMark][cm].
 
