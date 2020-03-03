@@ -40,7 +40,10 @@ extensions = [
     'sphinx.ext.mathjax',
     'recommonmark',
 ]
-
+mathjax_config = {
+    'extensions': ['tex2jax.js'],
+    'jax': ['input/TeX', 'output/HTML-CSS'],
+}
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
