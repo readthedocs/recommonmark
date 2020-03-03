@@ -181,6 +181,11 @@ class CodeBlockTests(unittest.TestCase):
         with sphinx_built_file('sphinx_code_block', '_build/text/index.html') as output:
             self.assertIn('<div class="highlight">', output)
 
+class MathBlockTests(unittest.TestCase):
+    def test_integration(self):
+        with sphinx_built_file('sphinx_inline_math', '_build/text/index.html') as output:
+            self.assertIn('MathJax.Hub.Config', output)
+
 
 class IndentedCodeTests(unittest.TestCase):
 
