@@ -14,19 +14,22 @@ Contents
 
 ## Getting Started
 
-To use `recommonmark` inside of Sphinx only takes 2 steps. 
-First you install it:
+To use `recommonmark` inside of Sphinx only takes 3 steps.
+
+First, install it:
 
 ```
-pip install recommonmark 
+pip install recommonmark
 ```
 
 Then add this to your Sphinx conf.py:
 
-```
+```python
 # for Sphinx-1.4 or newer
 extensions = ['recommonmark']
+```
 
+```python
 # for Sphinx-1.3
 from recommonmark.parser import CommonMarkParser
 
@@ -38,6 +41,9 @@ source_suffix = ['.rst', '.md']
 ```
 
 This allows you to write both `.md` and `.rst` files inside of the same project.
+
+And finally, add the `AutoStructify` transform to the `setup` function:
+see [the `AutoStructify` paragraph](#autostructify).
 
 ### Links
 
