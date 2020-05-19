@@ -17,6 +17,8 @@ This is a [pending ref](index)
 
 [example]: http://example.com/foobar "Example"
 
+External link to Markdown file: [Readme](https://github.com/readthedocs/recommonmark/blob/master/README.md).
+
 Foo
 
 ----

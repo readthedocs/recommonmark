@@ -125,6 +125,12 @@ class GenericTests(SphinxIntegrationTests):
              '</a>'),
             output
         )
+        self.assertIn(
+            ('External link to Markdown file: '
+             '<a class="reference external" '
+             'href="https://github.com/readthedocs/recommonmark/blob/master/README.md">Readme</a>.'),
+            output
+        )
 
     def test_image(self):
         output = self.read_file('index.html')
