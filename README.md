@@ -9,8 +9,8 @@ Documentation is available on Read the Docs: <http://recommonmark.readthedocs.or
 Contents
 --------
 
-* [API Reference](api_ref.md)
-* [AutoStructify Component](auto_structify.md)
+* [API Reference](docs/api_ref.md)
+* [AutoStructify Component](docs/auto_structify.md)
 
 ## Getting Started
 
