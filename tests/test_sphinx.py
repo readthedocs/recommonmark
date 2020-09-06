@@ -5,6 +5,7 @@ import shutil
 import unittest
 from contextlib import contextmanager
 
+from babel.messages.pofile import read_po
 from sphinx.application import Sphinx
 
 
@@ -33,18 +34,19 @@ def run_test(test_dir, test_file, test_string):
         assert test_string in output
 
 
-class SphinxIntegrationTests(unittest.TestCase):
+class SphinxBaseTests(unittest.TestCase):
 
     build_path = None
+    builder_name = 'html'
 
     def setUp(self):
-        if self.build_path is not None:
+        if self.build_path is not None and self.builder_name is not None:
             self.app = Sphinx(
                 srcdir=self.build_path,
                 confdir=self.build_path,
                 outdir=os.path.join(self.build_path, '_build', 'text'),
                 doctreedir=os.path.join(self.build_path, '_build', '.doctrees'),
-                buildername='html',
+                buildername=self.builder_name,
                 verbosity=1,
             )
             self.app.build(force_all=True)
@@ -57,6 +59,22 @@ class SphinxIntegrationTests(unittest.TestCase):
         full_path = os.path.join(self.build_path, '_build', 'text', path)
         with io.open(full_path, encoding='utf-8') as h:
             return h.read().strip()
+
+
+class SphinxIntegrationTests(SphinxBaseTests):
+
+    builder_name = 'html'
+
+
+class SphinxI18nTests(SphinxIntegrationTests):
+
+    builder_name = 'gettext'
+
+    def get_msgids(self, path):
+        full_path = os.path.join(self.build_path, '_build', 'text', path)
+        with io.open(full_path, encoding='utf-8') as h:
+            catalog = read_po(h)
+            return [message.id for message in catalog]
 
 
 class GenericTests(SphinxIntegrationTests):
@@ -226,3 +244,34 @@ class CustomExtensionTests(SphinxIntegrationTests):
              '</ul>\n</li>\n</ul>'),
             output
             )
+
+
+class I18nTests(SphinxI18nTests):
+
+    build_path = 'tests/sphinx_generic'
+
+    def test_msgids(self):
+        output = self.get_msgids('index.pot')
+        self.assertEqual(
+            [
+                '',
+                'Heading 1',
+                'Heading 2',
+                'Heading 3',
+                'Heading 4',
+                'This is a [link](http://example.com "Example")',
+                'This is a [ref link][example]',
+                'This is a [relative link](/example)',
+                'This is a [pending ref](index)',
+                'Foo',
+                'Bar',
+                '![foo "handle quotes"](/image.png "Example")',
+                'Item A',
+                'Item B',
+                'Item C',
+                'Item 1',
+                'Item 2',
+                'Item 3',
+            ],
+            output,
+        )
