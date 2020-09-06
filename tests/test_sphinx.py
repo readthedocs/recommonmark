@@ -5,7 +5,6 @@ import shutil
 import unittest
 from contextlib import contextmanager
 
-import docutils
 from sphinx.application import Sphinx
 
 
@@ -218,16 +217,11 @@ class CustomExtensionTests(SphinxIntegrationTests):
         self.assertIn('<th class="head">data</th>', output)
         self.assertIn('</table>', output)
 
-        if docutils.__version_info__ >= (0, 16):
-            additional_class = ''
-        else:
-            additional_class = ' first'
+        self.assertIn('<div class="contents topic" id="contents">\n', output)
         self.assertIn(
-            ('<div class="contents topic" id="contents">\n'
-             '<p class="topic-title{}">Contents</p>\n'
-             '<ul class="simple">\n'
+            ('<ul class="simple">\n'
              '<li><a class="reference internal" href="#header" id="id1">Header</a><ul>\n'
              '<li><a class="reference internal" href="#header-2" id="id2">Header 2</a></li>\n'
-             '</ul>\n</li>\n</ul>'.format(additional_class)),
+             '</ul>\n</li>\n</ul>'),
             output
             )
