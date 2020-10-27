@@ -251,7 +251,7 @@ class AutoStructify(transforms.Transform):
                     0, node=node, match_titles=True)
                 return node.children[:]
         else:
-            match = re.search('[ ]?[\w_-]+::.*', language)
+            match = re.search(r'[ ]?[\w_-]+::.*', language)
             if match:
                 parser = Parser()
                 new_doc = new_document(None, self.document.settings)

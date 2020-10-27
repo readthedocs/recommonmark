@@ -32,7 +32,7 @@ class TestParsing(unittest.TestCase):
 
             Body
             """,
-            """
+            r"""
             <?xml version="1.0" ?>
             <document source="&lt;string&gt;">
               <section ids="heading-1" names="heading\ 1">
@@ -52,7 +52,7 @@ class TestParsing(unittest.TestCase):
             """
             <?xml version="1.0" ?>
             <document source="&lt;string&gt;">
-              <section ids="heading-foo" names="heading\ foo">
+              <section ids="heading-foo" names="heading\\ foo">
                 <title>
                   Heading \n\
                   <emphasis>foo</emphasis>
