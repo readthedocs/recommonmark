@@ -1,6 +1,6 @@
 """Docutils CommonMark parser"""
 
-__version__ = '0.6.0'
+__version__ = '0.7.1'
 
 
 def setup(app):
