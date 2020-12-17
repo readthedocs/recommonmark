@@ -1,3 +1,14 @@
+Development
+----------
+
+Version 0.7.0
+-------------
+
+Date: 2020-12-17
+
+-   [limasierra](https://github.com/limasierra): Bugfix: External links to 'supported' files 
+    lose their file extension ([\#181](https://github.com/readthedocs/recommonmark/pull/181))
+ 
 
 Version 0.6.0
 -------------
