@@ -210,7 +210,7 @@ class CommonMarkParser(parsers.Parser):
         return wrap_node
 
     def depart_link(self, mdnode):
-        if isinstance(self.current_node.parent, addnodes.pending_xref):
+        if addnodes is not None and isinstance(self.current_node.parent, addnodes.pending_xref):
             self.current_node = self.current_node.parent.parent
         else:
             self.current_node = self.current_node.parent
