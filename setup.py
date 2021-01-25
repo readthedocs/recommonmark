@@ -25,8 +25,10 @@ setup(
     install_requires=[
         'commonmark>=0.8.1',
         'docutils>=0.11',
-        'sphinx>=1.3.1',
     ],
+    extras_require={
+        'sphinx': ['sphinx>=1.3.1'],
+    },
     entry_points={'console_scripts': [
         'cm2html = recommonmark.scripts:cm2html',
         'cm2latex = recommonmark.scripts:cm2latex',

@@ -4,7 +4,12 @@ import sys
 from os.path import splitext
 
 from docutils import parsers, nodes
-from sphinx import addnodes
+
+addnodes = None
+try:
+    from sphinx import addnodes
+except ImportError:
+    pass
 
 from commonmark import Parser
 
@@ -170,26 +175,39 @@ class CommonMarkParser(parsers.Parser):
             ref_node['title'] = mdnode.title
         next_node = ref_node
 
-        # If there's not a url scheme (e.g. 'https' for 'https:...' links),
-        # or there is a scheme but it's not in the list of known_url_schemes,
-        # then assume it's a cross-reference and pass it to Sphinx as an `:any:` ref.
         if not url_check.fragment and not scheme_known:
-            wrap_node = addnodes.pending_xref(
-                reftarget=unquote(destination),
-                reftype='any',
-                refdomain=None,  # Added to enable cross-linking
-                refexplicit=True,
-                refwarn=True
-            )
-            # TODO also not correct sourcepos
-            wrap_node.line = self._get_line(mdnode)
-            if mdnode.title:
-                wrap_node['title'] = mdnode.title
-            wrap_node.append(ref_node)
-            next_node = wrap_node
+            next_node = self.wrap_ref_node(ref_node)
 
         self.current_node.append(next_node)
         self.current_node = ref_node
+
+    def wrap_ref_node(self, ref_node):
+        """Wrap ref node in a Sphinx-specific pending_xref
+
+        If there's not a url scheme (e.g. 'https' for 'https:...' links),
+        or there is a scheme but it's not in the list of known_url_schemes,
+        then assume it's a cross-reference and pass it to Sphinx as an `:any:` ref.
+        """
+        if addnodes is None:
+            raise ImportError(
+                'An `:any:` ref was found, but Sphinx is not installed. '
+                'Subclass CommonMarkParser and override the wrap_ref_node() method '
+                'to resolve this error.'
+            )
+
+        wrap_node = addnodes.pending_xref(
+            reftarget=unquote(ref_node['refuri']),
+            reftype='any',
+            refdomain=None,  # Added to enable cross-linking
+            refexplicit=True,
+            refwarn=True
+        )
+        # TODO also not correct sourcepos
+        wrap_node.line = ref_node.line
+        if 'title' in ref_node:
+            wrap_node['title'] = ref_node['title']
+        wrap_node.append(ref_node)
+        return wrap_node
 
     def depart_link(self, mdnode):
         if isinstance(self.current_node.parent, addnodes.pending_xref):
