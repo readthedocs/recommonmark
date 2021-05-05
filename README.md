@@ -1,6 +1,6 @@
 # recommonmark
 
-**Warning** recommonmark is now deprecated. We recommend using [MyST](https://github.com/executablebooks/MyST-Parser) for a docutils bridge going forward. See [this issue](https://github.com/readthedocs/recommonmark/issues/221) for background and discussion.
+**Warning:** recommonmark is now deprecated. We recommend using [MyST](https://github.com/executablebooks/MyST-Parser) for a docutils bridge going forward. See [this issue](https://github.com/readthedocs/recommonmark/issues/221) for background and discussion.
 
 A `docutils`-compatibility bridge to [CommonMark][cm].
 
