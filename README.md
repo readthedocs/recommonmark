@@ -1,5 +1,7 @@
 # recommonmark
 
+**Warning** recommonmark is now deprecated. We recommend using [MyST](https://github.com/executablebooks/MyST-Parser) for a docutils bridge going forward.
+
 A `docutils`-compatibility bridge to [CommonMark][cm].
 
 This allows you to write CommonMark inside of Docutils & Sphinx projects.
